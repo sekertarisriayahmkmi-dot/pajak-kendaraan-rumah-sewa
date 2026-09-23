@@ -561,6 +561,47 @@
       transform: translateY(-2px)
     }
 
+    .stat-clickable {
+      cursor: pointer;
+      user-select: none;
+    }
+    .stat-clickable:hover {
+      border-color: rgba(229, 169, 59, 0.45);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .stat-clickable.stat-active {
+      border-color: var(--gold) !important;
+      background: rgba(229, 169, 59, 0.08) !important;
+      box-shadow: 0 0 16px rgba(229, 169, 59, 0.25);
+    }
+    .stat-clickable.stat-active-amber {
+      border-color: var(--amber) !important;
+      background: rgba(245, 158, 11, 0.08) !important;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+    }
+    .stat-clickable.stat-active-rose {
+      border-color: var(--rose) !important;
+      background: rgba(224, 91, 91, 0.08) !important;
+      box-shadow: 0 0 16px rgba(224, 91, 91, 0.25);
+    }
+    .stat-badge-dupe {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(224, 91, 91, 0.15);
+      color: var(--rose);
+      border: 1px solid rgba(224, 91, 91, 0.35);
+    }
+    .entry.entry-dupe {
+      border-color: rgba(224, 91, 91, 0.4) !important;
+      box-shadow: 0 0 12px rgba(224, 91, 91, 0.08);
+    }
+
     .stat::after {
       content: '';
       position: absolute;
@@ -1658,37 +1699,55 @@
 
         <!-- Stats -->
         <div class="stats">
-          <div class="stat">
+          <div class="stat stat-clickable" id="card-stat-total" onclick="filterPajakByStat('')" title="Klik untuk menampilkan semua kendaraan">
             <div class="stat-icon-wrap stat-icon-gold"><i class="fa-solid fa-car"></i></div>
             <div class="stat-num" id="s-total-k">0</div>
             <div class="stat-lbl">Total Kendaraan</div>
           </div>
-          <div class="stat">
+          <div class="stat stat-clickable" id="card-stat-segera" onclick="filterPajakByStat('segera')" title="Klik untuk memfilter: Jatuh Tempo ≤ 30 Hari">
             <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="stat-num" id="s-pajak-segera" style="color:var(--amber)">0</div>
             <div class="stat-lbl">Jatuh Tempo ≤ 30 Hari</div>
           </div>
-          <div class="stat">
+          <div class="stat stat-clickable" id="card-stat-tagihan" onclick="filterPajakByStat('segera')" title="Klik untuk memfilter: Tagihan Jatuh Tempo">
             <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-file-invoice-dollar"></i></div>
             <div class="stat-num" id="s-nom-segera" style="font-size:14px;padding-top:6px;color:var(--amber)">Rp 0</div>
             <div class="stat-lbl">Tagihan Pajak (≤ 30 Hari)</div>
           </div>
-          <div class="stat">
+          <div class="stat stat-clickable" id="card-stat-expired" onclick="filterPajakByStat('expired')" title="Klik untuk memfilter: Pajak Expired">
             <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-circle-xmark"></i></div>
             <div class="stat-num" id="s-pajak-exp" style="color:var(--rose)">0</div>
             <div class="stat-lbl">Pajak Expired</div>
           </div>
-          <div class="stat">
+          <div class="stat stat-clickable" id="card-stat-nominal" onclick="filterPajakByStat('')" title="Klik untuk melihat seluruh unit dan nominal">
             <div class="stat-icon-wrap stat-icon-teal"><i class="fa-solid fa-coins"></i></div>
             <div class="stat-num" id="s-nom-pajak" style="font-size:14px;padding-top:6px">Rp 0</div>
             <div class="stat-lbl">Total Nominal Pajak</div>
           </div>
-          <div class="stat" id="stat-tunggakan-wrap" style="display:none">
+          <div class="stat stat-clickable" id="stat-tunggakan-wrap" style="display:none" onclick="filterPajakByStat('tunggakan')" title="Klik untuk memfilter kendaraan yang memiliki estimasi tunggakan">
             <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-money-bill-wave"></i></div>
-            <div class="stat-num" id="s-nom-tunggakan" style="font-size:13px;padding-top:6px;color:var(--rose)">Rp 0
-            </div>
+            <div class="stat-num" id="s-nom-tunggakan" style="font-size:13px;padding-top:6px;color:var(--rose)">Rp 0</div>
             <div class="stat-lbl">Estimasi Tunggakan</div>
           </div>
+          <div class="stat stat-clickable" id="stat-duplikat-wrap" style="display:none" onclick="filterPajakByStat('duplikat')" title="Klik untuk melihat kendaraan dengan No. Polisi yang sama (Duplikat)">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-copy"></i></div>
+            <div class="stat-num" id="s-pajak-duplikat" style="font-size:15px;padding-top:6px;color:var(--rose)">0 Unit</div>
+            <div class="stat-lbl">Data Duplikat</div>
+          </div>
+        </div>
+
+        <!-- Alert Duplikat Banner -->
+        <div id="alert-duplikat-pajak" style="display:none;background:rgba(224,91,91,0.12);border:1px solid rgba(224,91,91,0.35);border-radius:12px;padding:12px 18px;margin-bottom:16px;cursor:pointer;align-items:center;justify-content:space-between;transition:all 0.2s" onclick="filterPajakByStat('duplikat')">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:34px;height:34px;border-radius:8px;background:rgba(224,91,91,0.22);display:flex;align-items:center;justify-content:center;color:var(--rose);font-size:16px;flex-shrink:0">
+              <i class="fa-solid fa-clone"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;color:var(--rose);font-size:13px" id="alert-duplikat-text">Terdeteksi Data Duplikat</div>
+              <div style="font-size:12px;color:var(--text-2)">Ditemukan kendaraan dengan No. Polisi yang sama persis. Klik di sini untuk melihat & merapikan data.</div>
+            </div>
+          </div>
+          <span class="btn btn-ghost" style="color:var(--rose);border-color:rgba(224,91,91,0.4);font-size:11.5px;padding:5px 12px;pointer-events:none">Lihat Duplikat</span>
         </div>
 
         <!-- Toolbar -->
@@ -1698,11 +1757,13 @@
             <input type="text" class="search" id="q-pajak" placeholder="Cari no. polisi, nama unit, atau pemilik…"
               oninput="renderPajak()" />
           </div>
-          <select class="select" id="f-pajak-sts" onchange="renderPajak()">
+          <select class="select" id="f-pajak-sts" onchange="onSelectFilterPajak()">
             <option value="">Semua Status</option>
             <option value="aktif">Aktif</option>
-            <option value="segera">Jatuh Tempo</option>
+            <option value="segera">Jatuh Tempo (≤ 30 Hari)</option>
             <option value="expired">Expired</option>
+            <option value="tunggakan">Menunggak Pajak</option>
+            <option value="duplikat" id="opt-pajak-duplikat" style="display:none;color:var(--rose)">⚠️ Data Duplikat</option>
           </select>
         </div>
 
@@ -1712,6 +1773,10 @@
             <div class="panel-head-left">
               <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-list-check"></i></div>
               <span class="panel-title">Daftar Kendaraan</span>
+              <span id="pajak-filter-indicator" style="display:none;margin-left:10px;background:rgba(229,169,59,0.15);color:var(--gold);border:1px solid rgba(229,169,59,0.3);padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;align-items:center;gap:6px">
+                <span id="pajak-filter-indicator-text">Filter</span>
+                <button onclick="filterPajakByStat('')" style="background:none;border:none;color:inherit;cursor:pointer;font-size:12px;padding:0 2px" title="Reset Filter">&times;</button>
+              </span>
             </div>
             <button class="btn btn-ghost" onclick="exportData('pajak')" style="font-size:12px;padding:8px 16px">
               <i class="fa-solid fa-arrow-down-to-bracket"></i> Export CSV
@@ -2345,7 +2410,10 @@
             </div>
             <div class="fgroup">
               <label class="flabel">Nomor Polisi <span>*</span></label>
-              <input type="text" class="finput" id="p-nopol" placeholder="Contoh: BM 1234 AB" />
+              <input type="text" class="finput" id="p-nopol" placeholder="Contoh: BM 1234 AB" oninput="checkNopolDuplicate()" />
+              <div id="p-nopol-dupe-warn" style="display:none;margin-top:6px;font-size:11.5px;color:var(--rose);background:rgba(224,91,91,0.12);border:1px solid rgba(224,91,91,0.3);padding:6px 10px;border-radius:6px">
+                <i class="fa-solid fa-triangle-exclamation"></i> <strong>Perhatian:</strong> No. Polisi ini sudah ada di: <span id="p-nopol-dupe-desc" style="font-weight:700"></span>
+              </div>
             </div>
             <div class="fgroup">
               <label class="flabel">Nama Pengguna <span>*</span></label>
@@ -2890,16 +2958,95 @@
       var tahunLewat = Math.ceil(Math.abs(dd) / 365);
       return nominal * tahunLewat;
     }
+    /* ─── FILTER & STATS INTERACTIVITY & DUPLICATE DETECTION ─── */
+    var activePajakFilter = '';
+
+    function normalizeNopol(np) {
+      return (np || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    }
+
+    function getDuplicateNopols() {
+      var counts = {};
+      S.pajak.forEach(function (d) {
+        var n = normalizeNopol(d.nopol);
+        if (n) counts[n] = (counts[n] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function checkNopolDuplicate() {
+      var val = document.getElementById('p-nopol').value;
+      var editId = document.getElementById('p-id') ? document.getElementById('p-id').value : '';
+      var warnEl = document.getElementById('p-nopol-dupe-warn');
+      var descEl = document.getElementById('p-nopol-dupe-desc');
+      if (!warnEl) return;
+      var norm = normalizeNopol(val);
+      if (!norm) { warnEl.style.display = 'none'; return; }
+
+      var match = S.pajak.find(function (d) {
+        return d.id !== editId && normalizeNopol(d.nopol) === norm;
+      });
+
+      if (match) {
+        warnEl.style.display = 'block';
+        if (descEl) descEl.textContent = match.namaUnit + ' (' + (match.atasNama || 'Pengguna') + ')';
+      } else {
+        warnEl.style.display = 'none';
+      }
+    }
+
+    function filterPajakByStat(st) {
+      if (activePajakFilter === st) {
+        activePajakFilter = '';
+      } else {
+        activePajakFilter = st;
+      }
+      var sel = document.getElementById('f-pajak-sts');
+      if (sel) sel.value = activePajakFilter;
+      renderPajak();
+
+      if (activePajakFilter) {
+        var el = document.getElementById('list-pajak');
+        if (el) {
+          var y = el.getBoundingClientRect().top + window.scrollY - 130;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }
+      }
+    }
+
+    function onSelectFilterPajak() {
+      var sel = document.getElementById('f-pajak-sts');
+      activePajakFilter = sel ? sel.value : '';
+      renderPajak();
+    }
+
     function renderPajak() {
       var q = (document.getElementById('q-pajak').value || '').toLowerCase();
-      var sf = document.getElementById('f-pajak-sts').value;
+      var sel = document.getElementById('f-pajak-sts');
+      var sf = sel ? sel.value : activePajakFilter;
+      activePajakFilter = sf;
       var list = document.getElementById('list-pajak');
+
+      var nopolCounts = getDuplicateNopols();
+      var dupeCount = 0;
+      S.pajak.forEach(function (d) {
+        if ((nopolCounts[normalizeNopol(d.nopol)] || 0) > 1) dupeCount++;
+      });
+
+      // Filter data
       var fd = S.pajak.filter(function (d) {
         var m = (d.namaUnit || '').toLowerCase().includes(q) || (d.nopol || '').toLowerCase().includes(q) || (d.atasNama || '').toLowerCase().includes(q);
         if (!m) return false;
-        if (sf && sts(daysTo(d.jatuhTempo)).cls !== sf) return false;
+        if (sf === 'tunggakan') {
+          if (hitungTunggakanPajak(d) <= 0) return false;
+        } else if (sf === 'duplikat') {
+          if ((nopolCounts[normalizeNopol(d.nopol)] || 0) <= 1) return false;
+        } else if (sf && sts(daysTo(d.jatuhTempo)).cls !== sf) {
+          return false;
+        }
         return true;
       });
+
       if (!fd.length) {
         list.innerHTML = '<div class="empty"><div class="empty-icon"><i class="fa-solid fa-car"></i></div><div class="empty-title">Tidak ada data ditemukan</div><div class="empty-desc">Coba ubah filter atau kata kunci pencarian</div></div>';
       } else {
@@ -2908,10 +3055,14 @@
           var stStnk = d.jatuhTempoStnk ? sts(daysTo(d.jatuhTempoStnk)) : null;
           var tunggakan = hitungTunggakanPajak(d);
           var tahunLewat = d.jatuhTempo && daysTo(d.jatuhTempo) < 0 ? Math.ceil(Math.abs(daysTo(d.jatuhTempo)) / 365) : 0;
-          return '<div class="entry">' +
+          var isDupe = (nopolCounts[normalizeNopol(d.nopol)] || 0) > 1;
+          var dupePill = isDupe ?
+            ' <span class="stat-badge-dupe" title="No. Polisi ini terdaftar lebih dari 1 kali"><i class="fa-solid fa-copy"></i> Duplikat (' + nopolCounts[normalizeNopol(d.nopol)] + ' Data)</span>' : '';
+
+          return '<div class="entry' + (isDupe ? ' entry-dupe' : '') + '">' +
             '<div class="entry-top">' +
             '<div class="entry-meta">' +
-            '<div class="entry-label"><i class="fa-solid fa-car-side" style="color:var(--gold);margin-right:5px"></i>Kendaraan</div>' +
+            '<div class="entry-label"><i class="fa-solid fa-car-side" style="color:var(--gold);margin-right:5px"></i>Kendaraan' + dupePill + '</div>' +
             '<div class="entry-name">' + esc(d.namaUnit) + '</div>' +
             '<div class="entry-sub"><strong>' + esc(d.nopol) + '</strong> &nbsp;·&nbsp; Pengguna: <strong>' + esc(d.atasNama) + '</strong>' + (d.warna ? ' &nbsp;·&nbsp; ' + esc(d.warna) : '') + ' </div>' +
             '</div>' +
@@ -2950,6 +3101,7 @@
             '</div>';
         }).join('');
       }
+
       // stats
       var tn = S.pajak.reduce(function (a, d) { return a + (parseInt(d.nominal) || 0) }, 0);
       var nomSegera = S.pajak.reduce(function (a, d) {
@@ -2960,18 +3112,82 @@
         if (ddStnk >= 0 && ddStnk <= 30) sum += (parseInt(d.nominalStnk) || 0);
         return a + sum;
       }, 0);
-      // Hitung total estimasi tunggakan semua kendaraan
       var totalTunggakan = S.pajak.reduce(function (a, d) { return a + hitungTunggakanPajak(d); }, 0);
+
       document.getElementById('s-total-k').textContent = S.pajak.length;
       document.getElementById('s-pajak-segera').textContent = S.pajak.filter(function (d) { var dd = daysTo(d.jatuhTempo); return dd >= 0 && dd <= 30 }).length;
       document.getElementById('s-nom-segera').textContent = cur(nomSegera);
       document.getElementById('s-pajak-exp').textContent = S.pajak.filter(function (d) { return daysTo(d.jatuhTempo) < 0 }).length;
       document.getElementById('s-nom-pajak').textContent = cur(tn);
-      // Tampilkan stat tunggakan hanya jika ada
+
+      // Tampilkan stat tunggakan jika ada
       var wrapTunggakan = document.getElementById('stat-tunggakan-wrap');
       if (wrapTunggakan) {
         wrapTunggakan.style.display = totalTunggakan > 0 ? '' : 'none';
         document.getElementById('s-nom-tunggakan').textContent = cur(totalTunggakan);
+      }
+
+      // Tampilkan stat & banner duplikat jika ada
+      var wrapDuplikat = document.getElementById('stat-duplikat-wrap');
+      if (wrapDuplikat) {
+        wrapDuplikat.style.display = dupeCount > 0 ? '' : 'none';
+        document.getElementById('s-pajak-duplikat').textContent = dupeCount + ' Unit';
+      }
+
+      var alertDupe = document.getElementById('alert-duplikat-pajak');
+      if (alertDupe) {
+        alertDupe.style.display = dupeCount > 0 ? 'flex' : 'none';
+        var txtEl = document.getElementById('alert-duplikat-text');
+        if (txtEl) txtEl.textContent = 'Terdeteksi ' + dupeCount + ' Data Kendaraan Duplikat (No. Polisi Sama)';
+      }
+
+      var optDupe = document.getElementById('opt-pajak-duplikat');
+      if (optDupe) {
+        optDupe.style.display = dupeCount > 0 ? '' : 'none';
+        optDupe.textContent = '⚠️ Data Duplikat (' + dupeCount + ' Unit)';
+      }
+
+      // Visual active state pada kartu-kartu stat
+      var cardTotal = document.getElementById('card-stat-total');
+      var cardSegera = document.getElementById('card-stat-segera');
+      var cardTagihan = document.getElementById('card-stat-tagihan');
+      var cardExp = document.getElementById('card-stat-expired');
+      var cardNom = document.getElementById('card-stat-nominal');
+      var cardTunggakanEl = document.getElementById('stat-tunggakan-wrap');
+      var cardDupeEl = document.getElementById('stat-duplikat-wrap');
+
+      [cardTotal, cardSegera, cardTagihan, cardExp, cardNom, cardTunggakanEl, cardDupeEl].forEach(function(c) {
+        if (c) c.classList.remove('stat-active', 'stat-active-amber', 'stat-active-rose');
+      });
+
+      if (sf === 'segera') {
+        if (cardSegera) cardSegera.classList.add('stat-active-amber');
+        if (cardTagihan) cardTagihan.classList.add('stat-active-amber');
+      } else if (sf === 'expired') {
+        if (cardExp) cardExp.classList.add('stat-active-rose');
+      } else if (sf === 'tunggakan') {
+        if (cardTunggakanEl) cardTunggakanEl.classList.add('stat-active-rose');
+      } else if (sf === 'duplikat') {
+        if (cardDupeEl) cardDupeEl.classList.add('stat-active-rose');
+      }
+
+      // Filter indicator badge
+      var ind = document.getElementById('pajak-filter-indicator');
+      var indTxt = document.getElementById('pajak-filter-indicator-text');
+      if (ind && indTxt) {
+        if (sf) {
+          var labelMap = {
+            'aktif': 'Aktif (' + fd.length + ')',
+            'segera': 'Jatuh Tempo ≤ 30 Hari (' + fd.length + ')',
+            'expired': 'Pajak Expired (' + fd.length + ')',
+            'tunggakan': 'Menunggak Pajak (' + fd.length + ')',
+            'duplikat': 'Data Duplikat (' + fd.length + ')'
+          };
+          indTxt.textContent = 'Filter: ' + (labelMap[sf] || sf);
+          ind.style.display = 'inline-flex';
+        } else {
+          ind.style.display = 'none';
+        }
       }
     }
 
@@ -3328,9 +3544,18 @@
 
     function filterSewaByStatus(st) {
       var el = document.getElementById('f-sewa-sts');
-      if (el) el.value = st;
+      if (el) {
+        if (el.value === st) el.value = '';
+        else el.value = st;
+      }
       renderSewa();
-      if (st) toast('Menampilkan data sewa rumah filter: ' + st, 'warn');
+      if (el && el.value) {
+        var listEl = document.getElementById('list-sewa');
+        if (listEl) {
+          var y = listEl.getBoundingClientRect().top + window.scrollY - 130;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }
+      }
     }
 
     function renderSewa() {
