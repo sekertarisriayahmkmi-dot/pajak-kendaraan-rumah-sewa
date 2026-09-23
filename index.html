@@ -3923,8 +3923,9 @@
         '.aktif { color: #16a34a; font-weight: bold; }' +
         '.dupe { background-color: #fee2e2; color: #991b1b; font-weight: bold; }' +
         '</style></head><body>' +
-        '<h2>DIVISI RIAYAH – PONDOK MUNZALAN MUBAROKAN</h2>' +
-        '<h3>' + title.toUpperCase() + '</h3>' +
+        '<h2>MASJID MUNZALAN MUBARAKAN</h2>' +
+        '<h3>DIVISI RIAYAH CENTER</h3>' +
+        '<h4>' + title.toUpperCase() + '</h4>' +
         '<p>Tanggal Cetak: ' + nowStr + ' | Total: ' + data.length + ' Data</p>' +
         '<table>';
 
@@ -4118,8 +4119,9 @@
         '@page { size: landscape; margin: 10mm; }' +
         'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #0f172a; margin: 0; padding: 15px; font-size: 11px; background: #ffffff; }' +
         '.kop-header { text-align: center; border-bottom: 2.5px solid #0f172a; padding-bottom: 12px; margin-bottom: 14px; }' +
-        '.kop-title { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; color: #0f172a; margin: 0 0 3px 0; }' +
-        '.kop-sub { font-size: 13px; font-weight: 700; color: #334155; margin: 0 0 4px 0; }' +
+        '.kop-title { font-size: 17px; font-weight: 800; letter-spacing: 0.8px; color: #0f172a; margin: 0 0 3px 0; }' +
+        '.kop-sub { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #0f172a; margin: 0 0 5px 0; }' +
+        '.kop-topic { font-size: 12.5px; font-weight: 700; color: #334155; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.3px; }' +
         '.kop-date { font-size: 10.5px; color: #64748b; margin: 0; }' +
         '.summary-box { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }' +
         '.sum-item { flex: 1; min-width: 120px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center; }' +
@@ -4139,8 +4141,9 @@
         '<div><button onclick="window.print()" style="background:#0284c7;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-weight:700;cursor:pointer">🖨️ Cetak / Simpan PDF</button></div>' +
         '</div>' +
         '<div class="kop-header">' +
-        '<div class="kop-title">DIVISI RIAYAH – PONDOK MUNZALAN MUBAROKAN</div>' +
-        '<div class="kop-sub">' + title + '</div>' +
+        '<div class="kop-title">MASJID MUNZALAN MUBARAKAN</div>' +
+        '<div class="kop-sub">DIVISI RIAYAH CENTER</div>' +
+        '<div class="kop-topic">' + title + '</div>' +
         '<div class="kop-date">Dokumen Rekapitulasi Resmi · Dicetak pada: ' + nowStr + '</div>' +
         '</div>' +
         summaryHtml +
@@ -4148,7 +4151,8 @@
         '<div class="sign-wrap">' +
         '<div class="sign-box">' +
         '<div>Pontianak, ' + new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + '</div>' +
-        '<div style="margin-top:4px">Penanggung Jawab Divisi Riayah,</div>' +
+        '<div style="margin-top:4px">Penanggung Jawab,</div>' +
+        '<div style="font-weight:700;color:#0f172a;margin-top:2px">DIVISI RIAYAH CENTER</div>' +
         '<div class="sign-line">Pengurus / Admin Riayah</div>' +
         '</div></div>' +
         '</body></html>';

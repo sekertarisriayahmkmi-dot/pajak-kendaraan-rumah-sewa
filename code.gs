@@ -1,7 +1,7 @@
 /**
  * =========================================================================
  * 🏠 BACKEND SCRIPT – Rekap Sewa & Pajak
- * Divisi Riayah - Pondok Munzalan Mubarokan
+ * Divisi Riayah - Masjid Munzalan Mubarakan
  * =========================================================================
  */
 
