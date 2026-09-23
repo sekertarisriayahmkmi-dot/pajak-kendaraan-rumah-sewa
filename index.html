@@ -1,0 +1,4014 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riayah Center – Rekapitulasi Pembayaran Sewa Rumah dan Pajak Kendaraan</title>
+  <meta name="description"
+    content="Sistem rekapitulasi sewa rumah dan pajak kendaraan dengan reminder email otomatis – Riayah Center Masjid Munzalan Mubarakan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ================================================================
+   DESIGN TOKENS
+================================================================ */
+    :root {
+      --bg-0: #05070a;
+      --bg-1: #090d12;
+      --bg-2: #0d1219;
+      --bg-3: #111820;
+      --bg-4: #161e28;
+      --surface: rgba(17, 24, 32, 0.75);
+      --surface-2: rgba(22, 30, 40, 0.85);
+      --border: rgba(255, 255, 255, 0.055);
+      --border-light: rgba(255, 255, 255, 0.09);
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201, 168, 76, 0.15);
+      --gold-glow: rgba(201, 168, 76, 0.25);
+      --teal: #2bb5a0;
+      --teal-dim: rgba(43, 181, 160, 0.12);
+      --rose: #e05b5b;
+      --rose-dim: rgba(224, 91, 91, 0.12);
+      --amber: #d4924a;
+      --amber-dim: rgba(212, 146, 74, 0.12);
+      --emerald: #3dba80;
+      --emerald-dim: rgba(61, 186, 128, 0.12);
+      --text-1: #f0f4f8;
+      --text-2: #8fa3b8;
+      --text-3: #4d6070;
+      --text-4: #2d3d4d;
+      --radius-xs: 6px;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 26px;
+      --radius-2xl: 34px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --dur: 220ms;
+    }
+
+    /* ================================================================
+   RESET & BASE
+================================================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg-0);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* ================================================================
+   NOISE + AMBIENT BACKGROUND
+================================================================ */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .scene-glow {
+      position: absolute;
+      width: 900px;
+      height: 900px;
+      border-radius: 50%;
+      filter: blur(180px);
+      opacity: 0.045;
+    }
+
+    .glow-1 {
+      background: #c9a84c;
+      top: -30%;
+      left: -15%
+    }
+
+    .glow-2 {
+      background: #2bb5a0;
+      bottom: -30%;
+      right: -15%
+    }
+
+    .glow-3 {
+      background: #6c5ce7;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%)
+    }
+
+    /* ================================================================
+   SCROLLBAR
+================================================================ */
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-1)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-4);
+      border-radius: 10px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gold)
+    }
+
+    /* ================================================================
+   LAYOUT SHELL
+================================================================ */
+    .shell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh
+    }
+
+    /* ================================================================
+   TOPBAR
+================================================================ */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      min-height: 68px;
+      padding: 8px 28px;
+      background: rgba(5, 7, 10, 0.85);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #b8922e, #e8c97a);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #0a0800;
+      box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-2);
+      font-weight: 600;
+      letter-spacing: 0.1px;
+      -webkit-text-fill-color: var(--text-2);
+      line-height: 1.2
+    }
+
+    .brand-sub-2 {
+      font-size: 9.5px;
+      color: var(--text-3);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      -webkit-text-fill-color: var(--text-3);
+      line-height: 1.2
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px
+    }
+
+    .time-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-chip i {
+      color: var(--gold);
+      font-size: 11px
+    }
+
+    /* ================================================================
+   TAB BAR
+================================================================ */
+    .tabbar {
+      background: rgba(9, 13, 18, 0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+    }
+
+    .tabbar::-webkit-scrollbar {
+      display: none
+    }
+
+    .tab {
+      position: relative;
+      padding: 13px 20px;
+      border: none;
+      background: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color var(--dur) var(--ease);
+      letter-spacing: 0.1px;
+    }
+
+    .tab::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 14px;
+      right: 14px;
+      height: 1.5px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 2px;
+      transform: scaleX(0);
+      transition: transform var(--dur) var(--ease);
+      box-shadow: 0 0 8px var(--gold-glow);
+    }
+
+    .tab:hover {
+      color: var(--text-2)
+    }
+
+    .tab.active {
+      color: var(--gold-light)
+    }
+
+    .tab.active::after {
+      transform: scaleX(1)
+    }
+
+    .tab-count {
+      background: rgba(201, 168, 76, 0.18);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+      border: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    /* ================================================================
+   MAIN
+================================================================ */
+    .main {
+      flex: 1;
+      padding: 32px 28px;
+      max-width: 1160px;
+      width: 100%;
+      margin: 0 auto
+    }
+
+    .page {
+      display: none
+    }
+
+    .page.active {
+      display: block;
+      animation: pagein var(--dur) var(--ease)
+    }
+
+    @keyframes pagein {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ================================================================
+   PAGE HEADER
+================================================================ */
+    .ph {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .ph-left {}
+
+    .ph-eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ph-eyebrow::before {
+      content: '';
+      width: 18px;
+      height: 1px;
+      background: var(--gold)
+    }
+
+    .ph-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.5px;
+      line-height: 1.2
+    }
+
+    .ph-desc {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 4px;
+      font-weight: 400
+    }
+
+    /* ================================================================
+   BUTTONS
+================================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--dur) var(--ease);
+      letter-spacing: 0.1px;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #b8922e, #e0b85a, #c9a84c);
+      color: #0a0800;
+      font-size: 12.5px;
+      padding: 10px 20px;
+      box-shadow: 0 4px 18px rgba(201, 168, 76, 0.28);
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201, 168, 76, 0.38)
+    }
+
+    .btn-gold:active {
+      transform: translateY(0)
+    }
+
+    .btn-ghost {
+      background: var(--bg-3);
+      border: 1px solid var(--border-light);
+      color: var(--text-2);
+      font-size: 12.5px;
+      padding: 9px 18px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-4);
+      color: var(--text-1);
+      border-color: var(--border-light)
+    }
+
+    /* ── SYNC BUTTON (topbar) ── */
+    .btn-sync {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(212, 146, 74, 0.45);
+      border-radius: 20px;
+      background: rgba(212, 146, 74, 0.12);
+      color: var(--amber);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 16px;
+      cursor: pointer;
+      letter-spacing: 0.2px;
+      transition: all 200ms ease;
+      animation: syncPulse 2s ease-in-out infinite;
+    }
+
+    .btn-sync:hover {
+      background: rgba(212, 146, 74, 0.22);
+      border-color: rgba(212, 146, 74, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .btn-sync.syncing i {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes syncPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(212, 146, 74, 0);
+      }
+
+      50% {
+        box-shadow: 0 0 0 5px rgba(212, 146, 74, 0.18);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .btn-edit-ic {
+      background: var(--teal-dim);
+      color: var(--teal);
+      border: 1px solid rgba(43, 181, 160, 0.18)
+    }
+
+    .btn-edit-ic:hover {
+      background: rgba(43, 181, 160, 0.22);
+      transform: scale(1.08)
+    }
+
+    .btn-del-ic {
+      background: var(--rose-dim);
+      color: var(--rose);
+      border: 1px solid rgba(224, 91, 91, 0.18)
+    }
+
+    .btn-del-ic:hover {
+      background: rgba(224, 91, 91, 0.22);
+      transform: scale(1.08)
+    }
+
+    /* ================================================================
+   STAT CARDS
+================================================================ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--dur), transform var(--dur);
+    }
+
+    .stat:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px)
+    }
+
+    .stat::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .stat-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+
+    .stat-icon-gold {
+      background: var(--gold-dim);
+      color: var(--gold)
+    }
+
+    .stat-icon-amber {
+      background: var(--amber-dim);
+      color: var(--amber)
+    }
+
+    .stat-icon-teal {
+      background: var(--teal-dim);
+      color: var(--teal)
+    }
+
+    .stat-icon-rose {
+      background: var(--rose-dim);
+      color: var(--rose)
+    }
+
+    .stat-icon-emerald {
+      background: var(--emerald-dim);
+      color: var(--emerald)
+    }
+
+    .stat-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -1px;
+      line-height: 1
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 5px;
+      font-weight: 500;
+      letter-spacing: 0.2px
+    }
+
+    /* ================================================================
+   TOOLBAR (search + filter)
+================================================================ */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative
+    }
+
+    .search-wrap i {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 13px;
+      pointer-events: none
+    }
+
+    .search {
+      width: 100%;
+      padding: 10px 13px 10px 38px;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-1);
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color var(--dur), box-shadow var(--dur);
+    }
+
+    .search:focus {
+      outline: none;
+      border-color: rgba(201, 168, 76, 0.4);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.07)
+    }
+
+    .search::placeholder {
+      color: var(--text-3)
+    }
+
+    .select {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-2);
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: border-color var(--dur);
+    }
+
+    .select:focus {
+      outline: none;
+      border-color: rgba(201, 168, 76, 0.4)
+    }
+
+    .select option {
+      background: var(--bg-2)
+    }
+
+    /* ================================================================
+   DATA PANEL
+================================================================ */
+    .panel {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .panel-head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .panel-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: 0.1px
+    }
+
+    /* ================================================================
+   ENTRY CARDS
+================================================================ */
+    .entries {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .entry {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: border-color var(--dur), background var(--dur), box-shadow var(--dur);
+      position: relative;
+    }
+
+    .entry:hover {
+      border-color: var(--border-light);
+      background: var(--bg-4);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .entry-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .entry-meta {
+      flex: 1
+    }
+
+    .entry-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 5px;
+    }
+
+    .entry-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.3px;
+      line-height: 1.3
+    }
+
+    .entry-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 3px
+    }
+
+    .entry-sub strong {
+      color: var(--text-2);
+      font-weight: 600
+    }
+
+    .entry-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .pill-aktif {
+      background: var(--emerald-dim);
+      color: var(--emerald);
+      border: 1px solid rgba(61, 186, 128, 0.22)
+    }
+
+    .pill-segera {
+      background: var(--amber-dim);
+      color: var(--amber);
+      border: 1px solid rgba(212, 146, 74, 0.22)
+    }
+
+    .pill-expired {
+      background: var(--rose-dim);
+      color: var(--rose);
+      border: 1px solid rgba(224, 91, 91, 0.22)
+    }
+
+    .pill i {
+      font-size: 7px
+    }
+
+    .entry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ef-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-3);
+      margin-bottom: 4px
+    }
+
+    .ef-val {
+      font-size: 13px;
+      color: var(--text-2);
+      font-weight: 500
+    }
+
+    .ef-val.gold {
+      color: var(--gold-light);
+      font-weight: 700
+    }
+
+    .ef-val.aktif {
+      color: var(--emerald)
+    }
+
+    .ef-val.segera {
+      color: var(--amber)
+    }
+
+    .ef-val.expired {
+      color: var(--rose)
+    }
+
+    .ef-val a {
+      color: var(--teal);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .ef-val a:hover {
+      color: var(--gold-light)
+    }
+
+    /* ================================================================
+   EMPTY STATE
+================================================================ */
+    .empty {
+      text-align: center;
+      padding: 64px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      color: var(--text-3);
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-2)
+    }
+
+    .empty-desc {
+      font-size: 12px;
+      color: var(--text-3);
+      max-width: 220px
+    }
+
+    /* ================================================================
+   MODAL
+================================================================ */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--bg-2);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-2xl);
+      width: 100%;
+      max-width: 660px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 32px 100px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      transform: translateY(24px) scale(0.96);
+      transition: transform var(--dur) var(--ease-spring);
+    }
+
+    .overlay.open .modal {
+      transform: translateY(0) scale(1)
+    }
+
+    .modal::-webkit-scrollbar {
+      display: none
+    }
+
+    .mhd {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 26px 18px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mhd-left {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .mhd-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      background: var(--gold-dim);
+      color: var(--gold);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    .mhd-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.3px
+    }
+
+    .mhd-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px
+    }
+
+    .mclose {
+      width: 34px;
+      height: 34px;
+      border: none;
+      background: var(--bg-3);
+      border-radius: 50%;
+      color: var(--text-3);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--dur);
+      border: 1px solid var(--border);
+    }
+
+    .mclose:hover {
+      background: var(--rose-dim);
+      color: var(--rose);
+      border-color: rgba(224, 91, 91, 0.3)
+    }
+
+    .mbody {
+      padding: 26px
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .fg .fw {
+      grid-column: 1/-1
+    }
+
+    .fgroup {
+      display: flex;
+      flex-direction: column;
+      gap: 7px
+    }
+
+    .flabel {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px
+    }
+
+    .flabel span {
+      color: var(--rose);
+      margin-left: 3px
+    }
+
+    .finput {
+      padding: 11px 14px;
+      width: 100%;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-1);
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color var(--dur), box-shadow var(--dur);
+    }
+
+    .finput:focus {
+      outline: none;
+      border-color: rgba(201, 168, 76, 0.5);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08)
+    }
+
+    .finput::placeholder {
+      color: var(--text-3)
+    }
+
+    select.finput option {
+      background: var(--bg-2)
+    }
+
+    /* ── DATE INPUT CALENDAR ICON ── */
+    input[type="date"].finput,
+    input[type="date"] {
+      color-scheme: dark;
+    }
+
+    input[type="date"].finput::-webkit-calendar-picker-indicator,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: brightness(0) invert(1);
+      cursor: pointer;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+
+    input[type="date"].finput::-webkit-calendar-picker-indicator:hover,
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+
+    /* ── AUTO-CALC BADGE ── */
+    .autocalc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(212, 146, 74, 0.12);
+      border: 1px solid rgba(212, 146, 74, 0.25);
+      color: var(--amber);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      animation: badgePop .35s var(--ease-spring);
+    }
+
+    @keyframes badgePop {
+      from {
+        opacity: 0;
+        transform: scale(0.7)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    /* auto-filled date input gets a subtle teal border */
+    .finput.auto-filled {
+      border-color: rgba(43, 181, 160, 0.45);
+      background: rgba(43, 181, 160, 0.04)
+    }
+
+    .mft {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 18px 26px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── CURRENCY INPUT WRAP ── */
+    .currency-wrap {
+      position: relative;
+    }
+
+    .currency-wrap .rp-prefix {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+      pointer-events: none;
+      letter-spacing: 0.3px;
+    }
+
+    .currency-wrap .finput {
+      padding-left: 36px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+    }
+
+    /* ================================================================
+   SECTION DIVIDER (forms)
+================================================================ */
+    .form-section {
+      margin-bottom: 22px
+    }
+
+    .form-section-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(201, 168, 76, 0.3), transparent)
+    }
+
+    /* ================================================================
+   ADMIN PAGE
+================================================================ */
+    .settings-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .sc-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .sc-head-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px
+    }
+
+    .sc-head-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-1)
+    }
+
+    .sc-head-desc {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px
+    }
+
+    .sc-body {
+      padding: 22px 24px
+    }
+
+    /* Email tags */
+    .email-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      min-height: 28px
+    }
+
+    .etag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .etag i.fa-envelope {
+      color: var(--teal);
+      font-size: 11px
+    }
+
+    .etag-del {
+      background: none;
+      border: none;
+      color: var(--text-3);
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+      padding: 0;
+      transition: color var(--dur)
+    }
+
+    .etag-del:hover {
+      color: var(--rose)
+    }
+
+    .email-add {
+      display: flex;
+      gap: 10px
+    }
+
+    .no-email {
+      font-size: 12px;
+      color: var(--text-3);
+      padding: 4px 0
+    }
+
+    /* Reminder grid */
+    .reminder-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    .range-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .range-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-2);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .range-title i {
+      color: var(--gold);
+      font-size: 12px
+    }
+
+    .range-hint {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 14px
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 5px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--border-light);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #b8922e, #e8c97a);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(201, 168, 76, 0.4);
+      transition: transform var(--dur) var(--ease-spring);
+    }
+
+    .range-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2)
+    }
+
+    .range-val {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -1px;
+    }
+
+    .range-val span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-3);
+      margin-left: 4px;
+      letter-spacing: 0
+    }
+
+    /* Toggles */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0
+    }
+
+    .toggle-info label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      display: block;
+      margin-bottom: 3px;
+      cursor: pointer
+    }
+
+    .toggle-info span {
+      font-size: 11px;
+      color: var(--text-3)
+    }
+
+    .switch {
+      position: relative;
+      width: 42px;
+      height: 23px;
+      flex-shrink: 0
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0
+    }
+
+    .sw-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: var(--bg-4);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all var(--dur);
+    }
+
+    .sw-track::before {
+      content: '';
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--text-3);
+      top: 2px;
+      left: 2px;
+      transition: all var(--dur);
+    }
+
+    .switch input:checked+.sw-track {
+      background: linear-gradient(135deg, #b8922e, #e8c97a);
+      border-color: transparent;
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.3);
+    }
+
+    .switch input:checked+.sw-track::before {
+      transform: translateX(19px);
+      background: #fff
+    }
+
+    /* ================================================================
+   TOAST
+================================================================ */
+    .toasts {
+      position: fixed;
+      top: 72px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .toast {
+      background: var(--bg-3);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      max-width: 320px;
+      animation: tin .3s var(--ease-spring);
+    }
+
+    .toast.ok {
+      border-left: 2px solid var(--emerald)
+    }
+
+    .toast.err {
+      border-left: 2px solid var(--rose)
+    }
+
+    .toast.warn {
+      border-left: 2px solid var(--amber)
+    }
+
+    @keyframes tin {
+      from {
+        opacity: 0;
+        transform: translateX(12px) scale(0.96)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1)
+      }
+    }
+
+    /* ================================================================
+   SPINNER
+================================================================ */
+    .spin {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(10, 8, 0, 0.2);
+      border-top-color: rgba(10, 8, 0, 0.85);
+      border-radius: 50%;
+      animation: rot .6s linear infinite;
+    }
+
+    @keyframes rot {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ================================================================
+   RESPONSIVE
+================================================================ */
+    @media(max-width:640px) {
+      .main {
+        padding: 20px 16px
+      }
+
+      .fg {
+        grid-template-columns: 1fr
+      }
+
+      .reminder-grid {
+        grid-template-columns: 1fr
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .topbar,
+      .tabbar {
+        padding-left: 16px;
+        padding-right: 16px
+      }
+
+      .tab {
+        padding: 11px 14px;
+        font-size: 12px
+      }
+
+      .entry-top {
+        flex-direction: column
+      }
+
+      .entry-right {
+        align-self: flex-start
+      }
+
+      .modal {
+        border-radius: var(--radius-xl)
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── SCENE ── -->
+  <div class="scene">
+    <div class="scene-glow glow-1"></div>
+    <div class="scene-glow glow-2"></div>
+    <div class="scene-glow glow-3"></div>
+  </div>
+
+  <!-- ── TOASTS ── -->
+  <div class="toasts" id="toasts"></div>
+
+  <!-- ── SHELL ── -->
+  <div class="shell">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-mosque"></i></div>
+        <div class="brand-text">
+          <span class="brand-name">Riayah Center</span>
+          <span class="brand-sub">Rekapitulasi Pembayaran Sewa Rumah dan Pajak Kendaraan</span>
+          <span class="brand-sub-2">Masjid Munzalan Mubarakan</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-sync" id="btnSync" onclick="syncLocalToSheet()"
+          title="Sinkronisasi data lokal ke Google Sheet" style="display:none">
+          <i class="fa-solid fa-rotate"></i> Sync ke Sheet
+        </button>
+        <div class="time-chip">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span id="clockEl">–</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- TAB BAR -->
+    <nav class="tabbar">
+      <button class="tab active" id="tab-pajak" onclick="switchTab('pajak')">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        Pajak Kendaraan
+        <span class="tab-count" id="cnt-pajak">0</span>
+      </button>
+      <button class="tab" id="tab-sewa" onclick="switchTab('sewa')">
+        <i class="fa-solid fa-house-chimney"></i>
+        Rumah Sewa
+        <span class="tab-count" id="cnt-sewa">0</span>
+      </button>
+      <button class="tab" id="tab-admin" onclick="switchTab('admin')">
+        <i class="fa-solid fa-sliders"></i>
+        Admin &amp; Reminder
+      </button>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ══════════════════════════════════════
+         PAGE 1 – PAJAK KENDARAAN
+    ══════════════════════════════════════ -->
+      <div class="page active" id="page-pajak">
+
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-eyebrow"><i class="fa-solid fa-car-side"></i>Kendaraan</div>
+            <h1 class="ph-title">Rekap Pajak Kendaraan</h1>
+            <p class="ph-desc">Data pembayaran pajak &amp; STNK seluruh unit kendaraan divisi</p>
+          </div>
+          <button class="btn btn-gold" id="btnAddPajak" onclick="openModal('pajak')">
+            <i class="fa-solid fa-plus"></i> Tambah Kendaraan
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-icon-wrap stat-icon-gold"><i class="fa-solid fa-car"></i></div>
+            <div class="stat-num" id="s-total-k">0</div>
+            <div class="stat-lbl">Total Kendaraan</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-num" id="s-pajak-segera" style="color:var(--amber)">0</div>
+            <div class="stat-lbl">Jatuh Tempo ≤ 30 Hari</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="stat-num" id="s-nom-segera" style="font-size:14px;padding-top:6px;color:var(--amber)">Rp 0</div>
+            <div class="stat-lbl">Tagihan Pajak (≤ 30 Hari)</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="stat-num" id="s-pajak-exp" style="color:var(--rose)">0</div>
+            <div class="stat-lbl">Pajak Expired</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon-wrap stat-icon-teal"><i class="fa-solid fa-coins"></i></div>
+            <div class="stat-num" id="s-nom-pajak" style="font-size:14px;padding-top:6px">Rp 0</div>
+            <div class="stat-lbl">Total Nominal Pajak</div>
+          </div>
+          <div class="stat" id="stat-tunggakan-wrap" style="display:none">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <div class="stat-num" id="s-nom-tunggakan" style="font-size:13px;padding-top:6px;color:var(--rose)">Rp 0
+            </div>
+            <div class="stat-lbl">Estimasi Tunggakan</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search" id="q-pajak" placeholder="Cari no. polisi, nama unit, atau pemilik…"
+              oninput="renderPajak()" />
+          </div>
+          <select class="select" id="f-pajak-sts" onchange="renderPajak()">
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="segera">Jatuh Tempo</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+
+        <!-- Panel -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-list-check"></i></div>
+              <span class="panel-title">Daftar Kendaraan</span>
+            </div>
+            <button class="btn btn-ghost" onclick="exportData('pajak')" style="font-size:12px;padding:8px 16px">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i> Export CSV
+            </button>
+          </div>
+          <div class="entries" id="list-pajak">
+            <div class="empty">
+              <div class="empty-icon"><i class="fa-solid fa-car"></i></div>
+              <div class="empty-title">Belum ada data kendaraan</div>
+              <div class="empty-desc">Klik <strong>Tambah Kendaraan</strong> untuk menambahkan data baru</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+         PAGE 2 – RUMAH SEWA
+    ══════════════════════════════════════ -->
+      <div class="page" id="page-sewa">
+
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-eyebrow"><i class="fa-solid fa-house-chimney"></i>Properti</div>
+            <h1 class="ph-title">Rekap Rumah Sewa</h1>
+            <p class="ph-desc">Data kontrak, penyewa, pemilik, dan dokumen MOU seluruh unit</p>
+          </div>
+          <button class="btn btn-gold" id="btnAddSewa" onclick="openModal('sewa')">
+            <i class="fa-solid fa-plus"></i> Tambah Data Sewa
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat" style="cursor:pointer" onclick="filterSewaByStatus('')"
+            title="Tampilkan Semua Status Kontrak">
+            <div class="stat-icon-wrap stat-icon-gold"><i class="fa-solid fa-house-chimney"></i></div>
+            <div class="stat-num" id="s-total-s">0</div>
+            <div class="stat-lbl">Total Rumah Sewa</div>
+          </div>
+          <div class="stat" style="cursor:pointer" onclick="filterSewaByStatus('segera')"
+            title="Klik untuk memfilter yang hampir berakhir">
+            <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-calendar-xmark"></i></div>
+            <div class="stat-num" id="s-sewa-segera" style="color:var(--amber)">0</div>
+            <div class="stat-lbl">Hampir Berakhir (≤30 hr)</div>
+          </div>
+          <div class="stat" style="cursor:pointer" onclick="filterSewaByStatus('expired')"
+            title="Klik untuk memfilter tagihan sewa/expired">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="stat-num" id="s-nom-sewa-segera" style="font-size:14px;padding-top:6px;color:var(--rose)">Rp 0
+            </div>
+            <div class="stat-lbl">Tagihan (≤30 hr + Expired)</div>
+          </div>
+          <div class="stat" style="cursor:pointer" onclick="filterSewaByStatus('expired')"
+            title="Klik untuk memfilter kontrak expired">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-ban"></i></div>
+            <div class="stat-num" id="s-sewa-exp" style="color:var(--rose)">0</div>
+            <div class="stat-lbl">Kontrak Expired</div>
+          </div>
+          <div class="stat" style="cursor:pointer" onclick="filterSewaByStatus('')">
+            <div class="stat-icon-wrap stat-icon-teal"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <div class="stat-num" id="s-biaya-sewa" style="font-size:14px;padding-top:6px">Rp 0</div>
+            <div class="stat-lbl">Total Biaya Sewa</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search" id="q-sewa" placeholder="Cari alamat rumah, penyewa, atau pemilik…"
+              oninput="renderSewa()" />
+          </div>
+          <select class="select" id="f-sewa-sts" onchange="renderSewa()">
+            <option value="">Semua Status Kontrak</option>
+            <option value="aktif">Kontrak Aktif</option>
+            <option value="segera">Hampir Berakhir (≤30 Hari)</option>
+            <option value="expired">Kontrak Expired</option>
+            <option value="selesai">Kontrak Selesai (Arsip)</option>
+          </select>
+          <select class="select" id="f-sewa-ket" onchange="renderSewa()">
+            <option value="">Semua Keterangan</option>
+            <option value="Sewa Tahunan">Sewa Tahunan</option>
+            <option value="Sewa 6 Bulan">Sewa 6 Bulan</option>
+            <option value="Sewa 3 Bulan">Sewa 3 Bulan</option>
+            <option value="Sewa Bulanan">Sewa Bulanan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <!-- Panel -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-house-circle-check"></i></div>
+              <span class="panel-title">Daftar Rumah Sewa</span>
+            </div>
+            <button class="btn btn-ghost" onclick="exportData('sewa')" style="font-size:12px;padding:8px 16px">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i> Export CSV
+            </button>
+          </div>
+          <div class="entries" id="list-sewa">
+            <div class="empty">
+              <div class="empty-icon"><i class="fa-solid fa-house-chimney"></i></div>
+              <div class="empty-title">Belum ada data sewa</div>
+              <div class="empty-desc">Klik <strong>Tambah Data Sewa</strong> untuk menambahkan kontrak baru</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+         PAGE 3 – ADMIN
+    ══════════════════════════════════════ -->
+      <div class="page" id="page-admin">
+
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-eyebrow"><i class="fa-solid fa-sliders"></i>Pengaturan</div>
+            <h1 class="ph-title">Admin &amp; Reminder</h1>
+            <p class="ph-desc">Kelola email penerima dan jadwal notifikasi otomatis</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-ghost" onclick="relockAdmin()" title="Kunci Kembali Halaman Admin"><i
+                class="fa-solid fa-lock"></i> Kunci Halaman</button>
+            <button class="btn btn-gold" id="btnSaveAdmin" onclick="saveAdmin()">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan
+            </button>
+          </div>
+        </div>
+        <!-- Email Recipients Kendaraan -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon stat-icon-gold"><i class="fa-solid fa-car"></i></div>
+            <div>
+              <div class="sc-head-title">Email Penerima Reminder Kendaraan (Pajak &amp; STNK)</div>
+              <div class="sc-head-desc">Daftar email yang khusus menerima notifikasi otomatis Pajak &amp; STNK Kendaraan
+              </div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <div class="email-tags" id="emailTagsPajak"></div>
+            <div class="email-add">
+              <div class="search-wrap" style="flex:1">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" class="search" id="inputEmailPajak"
+                  placeholder="Masukkan alamat email PIC kendaraan…" />
+              </div>
+              <button class="btn btn-gold" onclick="addEmailPajak()" style="padding:10px 18px">
+                <i class="fa-solid fa-plus"></i> Tambah Email Kendaraan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email Recipients Sewa -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon stat-icon-teal"><i class="fa-solid fa-house-chimney"></i></div>
+            <div>
+              <div class="sc-head-title">Email Penerima Reminder Sewa Rumah</div>
+              <div class="sc-head-desc">Daftar email yang khusus menerima notifikasi otomatis Sewa Rumah</div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <div class="email-tags" id="emailTagsSewa"></div>
+            <div class="email-add">
+              <div class="search-wrap" style="flex:1">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" class="search" id="inputEmailSewa"
+                  placeholder="Masukkan alamat email PIC sewa rumah…" />
+              </div>
+              <button class="btn btn-gold" onclick="addEmailSewa()" style="padding:10px 18px">
+                <i class="fa-solid fa-plus"></i> Tambah Email Sewa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Range Settings -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon stat-icon-amber"><i class="fa-solid fa-bell"></i></div>
+            <div>
+              <div class="sc-head-title">Pengaturan Range Waktu Reminder</div>
+              <div class="sc-head-desc">Tentukan berapa hari sebelum jatuh tempo notifikasi dikirim</div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <div class="reminder-grid">
+              <div class="range-card">
+                <div class="range-title"><i class="fa-solid fa-car-side"></i> Pajak Kendaraan</div>
+                <div class="range-hint">Hari sebelum jatuh tempo pajak</div>
+                <input type="range" class="range-slider" id="rPajak" min="7" max="90" value="30"
+                  oninput="setRv('rPajak','vPajak')" />
+                <div class="range-val"><span id="vPajak">30</span> <span>hari</span></div>
+              </div>
+              <div class="range-card">
+                <div class="range-title"><i class="fa-solid fa-id-card"></i> STNK Kendaraan</div>
+                <div class="range-hint">Hari sebelum jatuh tempo STNK</div>
+                <input type="range" class="range-slider" id="rStnk" min="7" max="90" value="14"
+                  oninput="setRv('rStnk','vStnk')" />
+                <div class="range-val"><span id="vStnk">14</span> <span>hari</span></div>
+              </div>
+              <div class="range-card">
+                <div class="range-title"><i class="fa-solid fa-house-chimney"></i> Sewa Rumah</div>
+                <div class="range-hint">Hari sebelum kontrak berakhir</div>
+                <input type="range" class="range-slider" id="rSewa" min="7" max="90" value="30"
+                  oninput="setRv('rSewa','vSewa')" />
+                <div class="range-val"><span id="vSewa">30</span> <span>hari</span></div>
+              </div>
+              <div class="range-card">
+                <div class="range-title"><i class="fa-solid fa-bell"></i> Frekuensi Reminder</div>
+                <div class="range-hint">Seberapa sering sistem memeriksa data <strong style="color:var(--gold)">&
+                    mengirim email reminder</strong></div>
+                <select class="select" id="selFreq" style="width:100%;margin-top:8px">
+                  <option value="daily">Setiap Hari (pukul 08.00)</option>
+                  <option value="weekly">Setiap Minggu (Senin)</option>
+                  <option value="monthly">Setiap Bulan (tgl 1)</option>
+                </select>
+                <div
+                  style="margin-top:10px;padding:8px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:11.5px;color:var(--text-2);line-height:1.6">
+                  <i class="fa-solid fa-circle-info" style="color:var(--gold);margin-right:5px"></i>
+                  <strong>Ya, sudah termasuk pengiriman email reminder.</strong> Sistem akan otomatis memeriksa data
+                  jatuh tempo dan mengirim email ke penerima yang terdaftar sesuai jadwal ini.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon stat-icon-teal"><i class="fa-solid fa-toggle-on"></i></div>
+            <div>
+              <div class="sc-head-title">Opsi Notifikasi</div>
+              <div class="sc-head-desc">Aktifkan atau nonaktifkan jenis reminder tertentu</div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label for="tgPajak">Reminder Pajak Kendaraan</label>
+                <span>Kirim email saat mendekati jatuh tempo pajak tahunan</span>
+              </div>
+              <label class="switch"><input type="checkbox" id="tgPajak" checked /><span class="sw-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label for="tgStnk">Reminder STNK</label>
+                <span>Kirim email saat mendekati jatuh tempo STNK</span>
+              </div>
+              <label class="switch"><input type="checkbox" id="tgStnk" checked /><span class="sw-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label for="tgSewa">Reminder Sewa Rumah</label>
+                <span>Kirim email saat kontrak sewa mendekati berakhir</span>
+              </div>
+              <label class="switch"><input type="checkbox" id="tgSewa" checked /><span class="sw-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label for="tgSeparate">Kirim Email Terpisah per Kategori</label>
+                <span>Kirim email terpisah untuk Kendaraan (Pajak/STNK) dan Sewa Rumah (bukan digabung)</span>
+              </div>
+              <label class="switch"><input type="checkbox" id="tgSeparate" /><span class="sw-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label for="tgMonthly">Laporan Bulanan</label>
+                <span>Kirim ringkasan rekap setiap awal bulan secara otomatis</span>
+              </div>
+              <label class="switch"><input type="checkbox" id="tgMonthly" /><span class="sw-track"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security PIN Settings -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon" style="background:var(--amber-dim);color:var(--amber)"><i
+                class="fa-solid fa-key"></i></div>
+            <div>
+              <div class="sc-head-title">PIN Keamanan Admin &amp; Reminder</div>
+              <div class="sc-head-desc">PIN ini digunakan untuk mengunci akses ke Halaman Admin (Default: 1234)</div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <div class="fg" style="max-width:320px">
+              <div class="fgroup">
+                <label class="flabel">PIN Akses Baru</label>
+                <input type="text" class="finput" id="adminPinInput" placeholder="Contoh: 1234" maxlength="10"
+                  style="letter-spacing:3px;font-weight:700" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Send -->
+        <div class="settings-card">
+          <div class="sc-head">
+            <div class="sc-head-icon" style="background:var(--rose-dim);color:var(--rose)"><i
+                class="fa-solid fa-paper-plane"></i></div>
+            <div>
+              <div class="sc-head-title">Uji Coba Pengiriman</div>
+              <div class="sc-head-desc">Kirim email tes ke semua penerima untuk memverifikasi sistem</div>
+            </div>
+          </div>
+          <div class="sc-body">
+            <button class="btn btn-gold" id="btnTest" onclick="testEmail()">
+              <i class="fa-solid fa-paper-plane"></i> Kirim Email Tes Sekarang
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /page-admin -->
+
+    </main>
+  </div><!-- /shell -->
+
+  <!-- ═══════════════════════════════════════
+     MODAL PIN LOCK
+═══════════════════════════════════════ -->
+  <div class="overlay" id="ov-pin">
+    <div class="modal" style="max-width:380px">
+      <div class="mhd" style="justify-content:center;position:relative;padding-bottom:12px">
+        <div class="mhd-left" style="flex-direction:column;gap:8px;align-items:center;text-align:center">
+          <div class="mhd-icon"
+            style="width:48px;height:48px;font-size:20px;border-radius:14px;background:var(--gold-dim);color:var(--gold)">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <div class="mhd-title" style="font-size:17px">Halaman Admin Terkunci</div>
+            <div class="mhd-sub">Masukkan PIN keamanan untuk melanjutkan</div>
+          </div>
+        </div>
+        <button class="mclose" onclick="closePinModal()" style="position:absolute;right:18px;top:18px"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody" style="padding:20px 24px">
+        <div class="fgroup">
+          <label class="flabel" style="text-align:center">PIN Keamanan (Default: 1234)</label>
+          <input type="password" class="finput" id="inputPin" placeholder="••••" maxlength="10"
+            style="text-align:center;font-size:22px;letter-spacing:8px;font-weight:700"
+            onkeyup="if(event.key==='Enter')verifyPin()" />
+        </div>
+      </div>
+      <div class="mft" style="justify-content:center;gap:10px">
+        <button class="btn btn-ghost" onclick="closePinModal()">Batal</button>
+        <button class="btn btn-gold" onclick="verifyPin()"><i class="fa-solid fa-key"></i> Buka Kunci</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     MODAL KONFIRMASI PEMBAYARAN PAJAK
+═══════════════════════════════════════ -->
+  <div class="overlay" id="ov-confirm-pajak">
+    <div class="modal" style="max-width:540px">
+      <div class="mhd">
+        <div class="mhd-left">
+          <div class="mhd-icon"
+            style="background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(61,186,128,0.25)"><i
+              class="fa-solid fa-file-circle-check"></i></div>
+          <div>
+            <div class="mhd-title">Konfirmasi Pembayaran Pajak</div>
+            <div class="mhd-sub">Pelunasan &amp; Pembaruan Otomatis Masa Berlaku</div>
+          </div>
+        </div>
+        <button class="mclose" onclick="closeModal('confirm-pajak')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody">
+        <input type="hidden" id="cp-id" />
+
+        <!-- Summary Box -->
+        <div
+          style="background:var(--bg-3);border:1px solid var(--border-light);border-radius:14px;padding:16px 18px;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span
+              style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase"><i
+                class="fa-solid fa-car-side" style="margin-right:4px"></i>Kendaraan</span>
+            <span id="cp-status-pill" class="pill pill-expired">Expired</span>
+          </div>
+          <div id="cp-unit-name" style="font-size:16px;font-weight:800;color:var(--text-1)">–</div>
+          <div id="cp-unit-sub" style="font-size:12.5px;color:var(--text-3);margin-top:3px">–</div>
+
+          <div
+            style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <div>
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:2px">Jatuh Tempo Status</div>
+              <div id="cp-due-date" style="font-size:13.5px;font-weight:700;color:var(--rose)">–</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:2px">Estimasi Tagihan / Tunggakan</div>
+              <div id="cp-due-nominal" style="font-size:14px;font-weight:800;color:var(--gold)">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Realization Form -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-receipt"></i> Realisasi Pembayaran Baru</div>
+          <div class="fg">
+            <div class="fgroup">
+              <label class="flabel">Tanggal Realisasi Pembayaran <span>*</span></label>
+              <input type="date" class="finput" id="cp-tglBayar" onchange="calcConfirmPajak()" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nominal Realisasi Dibayar (Rp) <span>*</span></label>
+              <div class="currency-wrap">
+                <span class="rp-prefix">Rp</span>
+                <input type="text" inputmode="numeric" class="finput" id="cp-nominal" placeholder="0"
+                  oninput="fmtInput(this); calcConfirmPajak()" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview / Calculation Results -->
+        <div
+          style="background:rgba(201,168,76,0.06);border:1px dashed rgba(201,168,76,0.3);border-radius:12px;padding:14px 18px;margin-top:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:12px;color:var(--text-2)"><i class="fa-solid fa-calculator"
+                style="margin-right:6px;color:var(--gold)"></i>Status Selisih Pembayaran:</span>
+            <span id="cp-diff-badge" style="font-size:12.5px;font-weight:800;color:var(--emerald)">Pas (Sesuai
+              Tagihan)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:12px;color:var(--text-2)"><i class="fa-solid fa-calendar-plus"
+                style="margin-right:6px;color:var(--amber)"></i>Jatuh Tempo Pajak Baru:</span>
+            <span id="cp-next-date" style="font-size:13px;font-weight:800;color:var(--gold)">–</span>
+          </div>
+        </div>
+
+        <!-- Section Jika Ada Kelebihan Pembayaran -->
+        <div id="cp-excess-wrap"
+          style="display:none;background:rgba(212,146,74,0.08);border:1px solid rgba(212,146,74,0.3);border-radius:12px;padding:14px 18px;margin-top:14px">
+          <div
+            style="font-size:12.5px;font-weight:800;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+            <span><i class="fa-solid fa-circle-exclamation" style="margin-right:6px"></i>Rincian Kelebihan
+              Pembayaran</span>
+            <span id="cp-excess-amount-lbl" style="font-size:13px;font-weight:800;color:var(--amber)">Rp 0</span>
+          </div>
+          <div class="fgroup" style="margin-bottom:0">
+            <label class="flabel" style="color:var(--amber)">Sebab Kelebihan Pembayaran <span>*</span></label>
+            <select class="select" id="cp-excess-reason" style="width:100%;margin-bottom:8px"
+              onchange="checkCustomExcessReason()">
+              <option value="Denda Keterlambatan Pajak">Denda Keterlambatan Pajak</option>
+              <option value="Biaya Jasa & Admin Samsat">Biaya Jasa &amp; Admin Samsat</option>
+              <option value="Biaya Buka Blokir / Mutasi STNK">Biaya Buka Blokir / Mutasi STNK</option>
+              <option value="Perubahan Tarif / Nilai Pajak Baru">Perubahan Tarif / Nilai Pajak Baru</option>
+              <option value="Lainnya">Lainnya (Tuliskan alasan…)</option>
+            </select>
+            <input type="text" class="finput" id="cp-excess-reason-custom"
+              placeholder="Tuliskan alasan kelebihan pembayaran…" style="display:none" />
+          </div>
+        </div>
+
+        <div class="fgroup" style="margin-top:16px">
+          <label class="flabel">Catatan Tambahan (Opsional)</label>
+          <input type="text" class="finput" id="cp-catatan"
+            placeholder="Contoh: Pembayaran dilakukan via Samsat Keliling" />
+        </div>
+
+      </div>
+      <div class="mft">
+        <button class="btn btn-ghost" onclick="closeModal('confirm-pajak')">Batal</button>
+        <button class="btn btn-gold"
+          style="background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;font-weight:700"
+          onclick="processConfirmPajak()">
+          <i class="fa-solid fa-circle-check"></i> Konfirmasi &amp; Lunasi Pajak
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     MODAL KONFIRMASI PERPANJANGAN SEWA RUMAH
+═══════════════════════════════════════ -->
+  <div class="overlay" id="ov-confirm-sewa">
+    <div class="modal" style="max-width:540px">
+      <div class="mhd">
+        <div class="mhd-left">
+          <div class="mhd-icon"
+            style="background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3)"><i
+              class="fa-solid fa-house-circle-check"></i></div>
+          <div>
+            <div class="mhd-title">Konfirmasi Kontrak Sewa</div>
+            <div class="mhd-sub">Perpanjang Masa Kontrak atau Selesaikan Sewa</div>
+          </div>
+        </div>
+        <button class="mclose" onclick="closeModal('confirm-sewa')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody">
+        <input type="hidden" id="cs-id" />
+        <input type="hidden" id="cs-decision" value="perpanjang" />
+
+        <!-- Summary Box -->
+        <div
+          style="background:var(--bg-3);border:1px solid var(--border-light);border-radius:14px;padding:16px 18px;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span
+              style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase"><i
+                class="fa-solid fa-house-chimney" style="margin-right:4px"></i>Rumah Sewa</span>
+            <span id="cs-status-pill" class="pill pill-expired">Expired</span>
+          </div>
+          <div id="cs-unit-name" style="font-size:16px;font-weight:800;color:var(--text-1)">–</div>
+          <div id="cs-unit-sub" style="font-size:12.5px;color:var(--text-3);margin-top:3px">–</div>
+
+          <div
+            style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <div>
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:2px">Tanggal Berakhir Kontrak</div>
+              <div id="cs-due-date" style="font-size:13.5px;font-weight:700;color:var(--rose)">–</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:2px">Biaya Sewa Saat Ini</div>
+              <div id="cs-due-nominal" style="font-size:14px;font-weight:800;color:var(--gold)">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decision Selector: Perpanjang vs Selesai -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <button type="button" id="cs-opt-perpanjang" class="btn"
+            style="padding:12px;border-radius:12px;font-weight:700;font-size:13px;justify-content:center;background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;border:none;box-shadow:var(--shadow-sm)"
+            onclick="selectSewaDecision('perpanjang')">
+            <i class="fa-solid fa-rotate" style="margin-right:6px"></i>Perpanjang Sewa
+          </button>
+          <button type="button" id="cs-opt-selesai" class="btn btn-ghost"
+            style="padding:12px;border-radius:12px;font-weight:700;font-size:13px;justify-content:center;border:1px solid var(--border)"
+            onclick="selectSewaDecision('selesai')">
+            <i class="fa-solid fa-circle-stop" style="margin-right:6px"></i>Kontrak Selesai
+          </button>
+        </div>
+
+        <!-- Form Perpanjang Kontrak -->
+        <div id="cs-box-perpanjang">
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa-solid fa-file-contract"></i> Detil Perpanjangan Sewa Baru</div>
+            <div class="fg">
+              <div class="fgroup">
+                <label class="flabel">Durasi / Keterangan Sewa Baru <span>*</span></label>
+                <select class="finput" id="cs-keterangan" onchange="calcConfirmSewa()">
+                  <option value="Sewa Tahunan">Sewa Tahunan (12 Bulan)</option>
+                  <option value="Sewa 6 Bulan">Sewa 6 Bulan</option>
+                  <option value="Sewa 3 Bulan">Sewa 3 Bulan</option>
+                  <option value="Sewa Bulanan">Sewa Bulanan (1 Bulan)</option>
+                </select>
+              </div>
+              <div class="fgroup">
+                <label class="flabel">Biaya Sewa Perpanjangan (Rp) <span>*</span></label>
+                <div class="currency-wrap">
+                  <span class="rp-prefix">Rp</span>
+                  <input type="text" inputmode="numeric" class="finput" id="cs-biaya" placeholder="0"
+                    oninput="fmtInput(this); calcConfirmSewa()" />
+                </div>
+              </div>
+              <div class="fgroup">
+                <label class="flabel">Tanggal Mulai Perpanjangan <span>*</span></label>
+                <input type="date" class="finput" id="cs-tglMulai" onchange="calcConfirmSewa()" />
+              </div>
+              <div class="fgroup">
+                <label class="flabel">Tanggal Berakhir Baru (Otomatis)</label>
+                <input type="date" class="finput" id="cs-tglBerakhir" readonly
+                  style="background:var(--bg-4);color:var(--gold);font-weight:700" />
+              </div>
+            </div>
+          </div>
+
+          <div class="fgroup" style="margin-top:14px">
+            <label class="flabel">Catatan Perpanjangan / Penyesuaian Biaya (Opsional)</label>
+            <input type="text" class="finput" id="cs-catatan-perpanjang"
+              placeholder="Contoh: Perpanjang 1 tahun, biaya disesuaikan naik Rp 500rb" />
+          </div>
+        </div>
+
+        <!-- Form Kontrak Selesai / Tidak Diperpanjang -->
+        <div id="cs-box-selesai"
+          style="display:none;background:rgba(235,94,85,0.06);border:1px dashed rgba(235,94,85,0.3);border-radius:12px;padding:16px;margin-top:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--rose);margin-bottom:6px">
+            <i class="fa-solid fa-info-circle" style="margin-right:6px"></i>Selesaikan Kontrak Sewa
+          </div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:12px">
+            Data sewa akan ditandai sebagai <strong>Kontrak Selesai (Arsip)</strong>. Data tidak akan dihapus dan tetap
+            tersimpan di Google Sheet untuk rekapitulasi histori.
+          </div>
+          <div class="fgroup" style="margin-bottom:0">
+            <label class="flabel" style="color:var(--rose)">Catatan Pengakhiran Sewa (Opsional)</label>
+            <input type="text" class="finput" id="cs-catatan-selesai"
+              placeholder="Contoh: Masa sewa habis, kunci sudah dikembalikan &amp; deposit lunas" />
+          </div>
+        </div>
+
+      </div>
+      <div class="mft">
+        <button class="btn btn-ghost" onclick="closeModal('confirm-sewa')">Batal</button>
+        <button class="btn btn-gold" id="cs-btn-submit"
+          style="background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;font-weight:700"
+          onclick="processConfirmSewa()">
+          <i class="fa-solid fa-circle-check"></i> Simpan Perpanjangan Kontrak
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     MODAL PAJAK
+═══════════════════════════════════════ -->
+  <div class="overlay" id="ov-pajak">
+    <div class="modal">
+      <div class="mhd">
+        <div class="mhd-left">
+          <div class="mhd-icon"><i class="fa-solid fa-car-side"></i></div>
+          <div>
+            <div class="mhd-title" id="mTitle-pajak">Tambah Kendaraan</div>
+            <div class="mhd-sub">Isi semua field bertanda * wajib diisi</div>
+          </div>
+        </div>
+        <button class="mclose" onclick="closeModal('pajak')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody">
+        <input type="hidden" id="p-id" />
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-car"></i> Identitas Kendaraan</div>
+          <div class="fg">
+            <div class="fgroup">
+              <label class="flabel">Nama Unit Kendaraan <span>*</span></label>
+              <input type="text" class="finput" id="p-namaUnit" placeholder="Contoh: Toyota Avanza Veloz" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nomor Polisi <span>*</span></label>
+              <input type="text" class="finput" id="p-nopol" placeholder="Contoh: BM 1234 AB" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nama Pengguna <span>*</span></label>
+              <input type="text" class="finput" id="p-atasNama" placeholder="Nama pengguna kendaraan" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Warna Kendaraan</label>
+              <input type="text" class="finput" id="p-warna" placeholder="Contoh: Putih Mutiara" />
+            </div>
+          </div>
+        </div>
+        <!-- ── PAJAK TAHUNAN ── -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-file-invoice-dollar"></i> Data Pajak Tahunan</div>
+          <div class="fg">
+            <div class="fgroup">
+              <label class="flabel">Jatuh Tempo Pajak (Saat Ini) <span>*</span></label>
+              <input type="date" class="finput" id="p-jatuhTempo" onchange="autoNextPajakFromTempo()" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nominal Pajak (Rp)</label>
+              <div class="currency-wrap">
+                <span class="rp-prefix">Rp</span>
+                <input type="text" inputmode="numeric" class="finput" id="p-nominal" placeholder="0"
+                  oninput="fmtInput(this)" />
+              </div>
+            </div>
+            <!-- Hidden Fields untuk kompatibilitas data -->
+            <input type="hidden" id="p-tglBayar" />
+            <input type="hidden" id="p-nextJatuhTempo" />
+            <span id="badge-nextPajak" style="display:none"></span>
+          </div>
+        </div>
+        <!-- ── STNK (5 TAHUN) ── -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-id-card"></i> Data STNK <span
+              style="font-size:9px;font-weight:500;color:var(--text-3);background:var(--bg-4);padding:2px 8px;border-radius:8px;margin-left:4px;letter-spacing:0.5px">PERPANJANG
+              5 TAHUN SEKALI</span></div>
+          <div class="fg">
+            <div class="fgroup">
+              <label class="flabel">Jatuh Tempo STNK (Saat Ini)</label>
+              <input type="date" class="finput" id="p-jatuhTempoStnk" onchange="autoNextStnkFromTempo()" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nominal STNK (Rp)</label>
+              <div class="currency-wrap">
+                <span class="rp-prefix">Rp</span>
+                <input type="text" inputmode="numeric" class="finput" id="p-nominalStnk" placeholder="0"
+                  oninput="fmtInput(this)" />
+              </div>
+            </div>
+            <!-- Hidden Fields untuk kompatibilitas data -->
+            <input type="hidden" id="p-tglStnk" />
+            <input type="hidden" id="p-nextJatuhTempoStnk" />
+            <span id="badge-nextStnk" style="display:none"></span>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fgroup fw">
+            <label class="flabel">Keterangan Tambahan</label>
+            <input type="text" class="finput" id="p-keterangan" placeholder="Catatan khusus (opsional)…" />
+          </div>
+        </div>
+      </div>
+      <div class="mft">
+        <button class="btn btn-ghost" onclick="closeModal('pajak')">Batal</button>
+        <button class="btn btn-gold" id="btnSavePajak" onclick="savePajak()">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+     MODAL SEWA
+═══════════════════════════════════════ -->
+  <div class="overlay" id="ov-sewa">
+    <div class="modal">
+      <div class="mhd">
+        <div class="mhd-left">
+          <div class="mhd-icon" style="background:var(--teal-dim);color:var(--teal);border-color:rgba(43,181,160,0.2)">
+            <i class="fa-solid fa-house-chimney"></i>
+          </div>
+          <div>
+            <div class="mhd-title" id="mTitle-sewa">Tambah Data Sewa</div>
+            <div class="mhd-sub">Isi semua field bertanda * wajib diisi</div>
+          </div>
+        </div>
+        <button class="mclose" onclick="closeModal('sewa')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mbody">
+        <input type="hidden" id="s-id" />
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-house"></i> Data Rumah</div>
+          <div class="fg">
+            <div class="fgroup fw">
+              <label class="flabel">Alamat / Unit Rumah Sewa <span>*</span></label>
+              <input type="text" class="finput" id="s-namaRumah" placeholder="Contoh: Jl. Paris 2 No. 15" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nama Penyewa <span>*</span></label>
+              <input type="text" class="finput" id="s-namaPenyewa" placeholder="Nama lengkap penyewa" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Nama Pemilik <span>*</span></label>
+              <input type="text" class="finput" id="s-namaPemilik" placeholder="Nama lengkap pemilik rumah" />
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-solid fa-file-contract"></i> Kontrak Sewa</div>
+          <div class="fg">
+            <div class="fgroup">
+              <label class="flabel">Keterangan Sewa <span>*</span></label>
+              <select class="finput" id="s-keterangan" onchange="autoNextSewa()">
+                <option value="">– Pilih –</option>
+                <option value="Sewa Tahunan">Sewa Tahunan</option>
+                <option value="Sewa 6 Bulan">Sewa 6 Bulan</option>
+                <option value="Sewa 3 Bulan">Sewa 3 Bulan</option>
+                <option value="Sewa Bulanan">Sewa Bulanan</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Biaya Sewa (Rp) <span>*</span></label>
+              <div class="currency-wrap">
+                <span class="rp-prefix">Rp</span>
+                <input type="text" inputmode="numeric" class="finput" id="s-biaya" placeholder="0"
+                  oninput="fmtInput(this)" />
+              </div>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Tanggal Mulai Sewa <span>*</span></label>
+              <input type="date" class="finput" id="s-tglMulai" oninput="autoNextSewa()" onchange="autoNextSewa()" />
+            </div>
+            <div class="fgroup">
+              <label class="flabel" style="display:flex;align-items:center;gap:6px">
+                Tanggal Berakhir Sewa <span>*</span>
+                <span class="autocalc-badge" id="badge-nextSewa" style="display:none">⚡ Otomatis</span>
+              </label>
+              <input type="date" class="finput" id="s-tglBerakhir" />
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa-brands fa-google-drive"></i> Dokumen Google Drive & Files</div>
+          <div class="fg">
+            <div class="fgroup fw">
+              <label class="flabel">Link MOU / Kontrak</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="url" class="finput" id="s-linkMou" placeholder="https://drive.google.com/…"
+                  style="flex:1" />
+                <label for="s-fileMou" class="btn btn-outline btn-sm"
+                  style="cursor:pointer;white-space:nowrap;padding:9px 12px;margin:0"
+                  title="Upload file ke Google Drive">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                </label>
+                <input type="file" id="s-fileMou" accept="image/*,.pdf,.doc,.docx" style="display:none"
+                  onchange="handleFileUpload(this, 's-linkMou', 's-statusMou')" />
+              </div>
+              <span id="s-statusMou"
+                style="font-size:11px;color:var(--accent-gold);margin-top:4px;display:block"></span>
+            </div>
+            <div class="fgroup fw">
+              <label class="flabel">Link Foto Kondisi Awal Rumah</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="url" class="finput" id="s-linkKondisi" placeholder="https://drive.google.com/…"
+                  style="flex:1" />
+                <label for="s-fileKondisi" class="btn btn-outline btn-sm"
+                  style="cursor:pointer;white-space:nowrap;padding:9px 12px;margin:0"
+                  title="Upload foto/file ke Google Drive">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                </label>
+                <input type="file" id="s-fileKondisi" accept="image/*,.pdf,.doc,.docx" style="display:none"
+                  onchange="handleFileUpload(this, 's-linkKondisi', 's-statusKondisi')" />
+              </div>
+              <span id="s-statusKondisi"
+                style="font-size:11px;color:var(--accent-gold);margin-top:4px;display:block"></span>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fgroup fw">
+            <label class="flabel">Catatan Tambahan</label>
+            <input type="text" class="finput" id="s-catatan"
+              placeholder="Keterangan khusus terkait rumah atau penyewa…" />
+          </div>
+        </div>
+      </div>
+      <div class="mft">
+        <button class="btn btn-ghost" onclick="closeModal('sewa')">Batal</button>
+        <button class="btn btn-gold" id="btnSaveSewa" onclick="saveSewa()">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+  <script>
+    /* ─── STATE ─────────────────────────────── */
+    var S = {
+      pajak: [],
+      sewa: [],
+      admin: {
+        emails: [], emailsPajak: [], emailsSewa: [],
+        rangePajak: 30, rangeSewa: 30, rangeStnk: 14,
+        frequency: 'daily',
+        tgPajak: true, tgStnk: true, tgSewa: true, tgMonthly: false, tgSeparate: true
+      }
+    };
+    var editId = { pajak: null, sewa: null };
+
+    /* ─── UTILS ─────────────────────────────── */
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
+    function cur(n) { if (!n || isNaN(n)) return 'Rp 0'; return 'Rp ' + parseInt(n).toLocaleString('id-ID') }
+
+    /* ─── CURRENCY INPUT FORMATTER ──────────── */
+    function fmtInput(el) {
+      var pos = el.selectionStart;
+      var raw = el.value.replace(/\D/g, '');
+      if (!raw) { el.value = ''; return }
+      var fmt = parseInt(raw, 10).toLocaleString('id-ID');
+      var prevLen = el.value.length;
+      el.value = fmt;
+      // adjust cursor: account for added separators
+      var diff = fmt.length - prevLen;
+      el.setSelectionRange(pos + diff, pos + diff);
+    }
+    function rawVal(id) {
+      var v = (document.getElementById(id).value || '').replace(/\./g, '').replace(/,/g, '');
+      return v ? parseInt(v, 10) || 0 : 0;
+    }
+    function setFmt(id, num) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var n = parseInt(num) || 0;
+      el.value = n ? n.toLocaleString('id-ID') : '';
+    }
+    function fdate(d) {
+      if (!d) return '–';
+      try { return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) } catch (e) { return d }
+    }
+    function daysTo(ds) {
+      if (!ds) return 9999;
+      var n = new Date(); n.setHours(0, 0, 0, 0);
+      return Math.ceil((new Date(ds) - n) / 86400000);
+    }
+    function sts(days) {
+      if (days < 0) return { cls: 'expired', label: 'Expired' };
+      if (days <= 30) return { cls: 'segera', label: days + ' hari lagi' };
+      return { cls: 'aktif', label: days + ' hari lagi' };
+    }
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
+    function toast(msg, type) {
+      type = type || 'ok';
+      var icons = {
+        ok: '<i class="fa-solid fa-circle-check" style="color:var(--emerald)"></i>',
+        err: '<i class="fa-solid fa-circle-xmark" style="color:var(--rose)"></i>',
+        warn: '<i class="fa-solid fa-triangle-exclamation" style="color:var(--amber)"></i>'
+      };
+      var el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.innerHTML = (icons[type] || '') + ' <span>' + msg + '</span>';
+      document.getElementById('toasts').appendChild(el);
+      setTimeout(function () { el.style.opacity = '0'; el.style.transform = 'translateX(12px)'; el.style.transition = '.3s'; setTimeout(function () { el.remove() }, 300) }, 3200);
+    }
+
+    /* ─── CLOCK ─────────────────────────────── */
+    function tick() { document.getElementById('clockEl').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }
+    setInterval(tick, 1000); tick();
+
+    /* ─── TABS & SECURITY LOCK ───────────────── */
+    var adminUnlocked = false;
+
+    function switchTab(t) {
+      if (t === 'admin' && !adminUnlocked) {
+        openPinModal();
+        return;
+      }
+      document.querySelectorAll('.tab').forEach(function (b) { b.classList.remove('active') });
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active') });
+      document.getElementById('tab-' + t).classList.add('active');
+      document.getElementById('page-' + t).classList.add('active');
+    }
+
+    function openPinModal() {
+      document.getElementById('inputPin').value = '';
+      document.getElementById('ov-pin').classList.add('open');
+      setTimeout(function () { document.getElementById('inputPin').focus(); }, 150);
+    }
+    function closePinModal() {
+      document.getElementById('ov-pin').classList.remove('open');
+    }
+    function verifyPin() {
+      var entered = document.getElementById('inputPin').value.trim();
+      var correctPin = (S.admin && S.admin.pin) ? String(S.admin.pin) : '1234';
+      if (entered === correctPin) {
+        adminUnlocked = true;
+        closePinModal();
+        toast('Akses Admin berhasil dibuka!', 'ok');
+        switchTab('admin');
+      } else {
+        toast('PIN Salah! Silakan coba lagi.', 'err');
+        var el = document.getElementById('inputPin');
+        el.value = '';
+        el.focus();
+      }
+    }
+    function relockAdmin() {
+      adminUnlocked = false;
+      switchTab('pajak');
+      toast('Halaman Admin terkunci kembali.', 'warn');
+    }
+
+    /* ─── MODAL ──────────────────────────────── */
+    function openModal(type, id) {
+      if (type === 'pajak') {
+        document.getElementById('mTitle-pajak').textContent = id ? 'Edit Kendaraan' : 'Tambah Kendaraan';
+        if (id) {
+          var d = S.pajak.find(function (x) { return x.id === id });
+          if (d) {
+            editId.pajak = id;
+            document.getElementById('p-id').value = id;
+            document.getElementById('p-namaUnit').value = d.namaUnit || '';
+            document.getElementById('p-nopol').value = d.nopol || '';
+            document.getElementById('p-atasNama').value = d.atasNama || '';
+            document.getElementById('p-warna').value = d.warna || '';
+            document.getElementById('p-jatuhTempo').value = d.jatuhTempo || '';
+            setFmt('p-nominal', d.nominal);
+            document.getElementById('p-tglBayar').value = d.tglBayar || '';
+            document.getElementById('p-nextJatuhTempo').value = d.nextJatuhTempo || '';
+            document.getElementById('p-jatuhTempoStnk').value = d.jatuhTempoStnk || '';
+            setFmt('p-nominalStnk', d.nominalStnk);
+            document.getElementById('p-tglStnk').value = d.tglStnk || '';
+            document.getElementById('p-nextJatuhTempoStnk').value = d.nextJatuhTempoStnk || '';
+            document.getElementById('p-keterangan').value = d.keterangan || '';
+            // show badge only if auto-calc was done
+            document.getElementById('badge-nextPajak').style.display = d.nextJatuhTempo ? 'inline-flex' : 'none';
+            document.getElementById('badge-nextStnk').style.display = d.nextJatuhTempoStnk ? 'inline-flex' : 'none';
+          }
+        } else {
+          editId.pajak = null;
+          ['p-id', 'p-namaUnit', 'p-nopol', 'p-atasNama', 'p-warna', 'p-jatuhTempo', 'p-nominal', 'p-tglBayar', 'p-nextJatuhTempo', 'p-jatuhTempoStnk', 'p-nominalStnk', 'p-tglStnk', 'p-nextJatuhTempoStnk', 'p-keterangan'].forEach(function (f) { document.getElementById(f).value = '' });
+          document.getElementById('badge-nextPajak').style.display = 'none';
+          document.getElementById('badge-nextStnk').style.display = 'none';
+        }
+        document.getElementById('ov-pajak').classList.add('open');
+      } else {
+        document.getElementById('mTitle-sewa').textContent = id ? 'Edit Data Sewa' : 'Tambah Data Sewa';
+        if (id) {
+          var d2 = S.sewa.find(function (x) { return x.id === id });
+          if (d2) {
+            editId.sewa = id;
+            document.getElementById('s-id').value = id;
+            document.getElementById('s-namaRumah').value = d2.namaRumah || '';
+            document.getElementById('s-namaPenyewa').value = d2.namaPenyewa || '';
+            document.getElementById('s-namaPemilik').value = d2.namaPemilik || '';
+            document.getElementById('s-keterangan').value = d2.keterangan || '';
+            setFmt('s-biaya', d2.biaya);
+            document.getElementById('s-tglMulai').value = d2.tglMulai || '';
+            document.getElementById('s-tglBerakhir').value = d2.tglBerakhir || '';
+            document.getElementById('s-linkMou').value = d2.linkMou || '';
+            document.getElementById('s-linkKondisi').value = d2.linkKondisi || '';
+            document.getElementById('s-catatan').value = d2.catatan || '';
+          }
+        } else {
+          editId.sewa = null;
+          ['s-id', 's-namaRumah', 's-namaPenyewa', 's-namaPemilik', 's-biaya', 's-tglMulai', 's-tglBerakhir', 's-linkMou', 's-linkKondisi', 's-catatan'].forEach(function (f) { document.getElementById(f).value = '' });
+          document.getElementById('s-keterangan').value = '';
+        }
+        document.getElementById('ov-sewa').classList.add('open');
+      }
+    }
+    function closeModal(t) { document.getElementById('ov-' + t).classList.remove('open'); editId[t] = null }
+    document.querySelectorAll('.overlay').forEach(function (o) {
+      o.addEventListener('click', function (e) { if (e.target === this) closeModal(this.id.replace('ov-', '')) })
+    });
+
+    /* ─── AUTO-CALC NEXT TEMPO ──────────────── */
+    function addYears(dateStr, years) {
+      if (!dateStr) return '';
+      var d = new Date(dateStr);
+      d.setFullYear(d.getFullYear() + years);
+      return d.toISOString().split('T')[0];
+    }
+    function autoNextPajak() {
+      var tgl = document.getElementById('p-tglBayar').value;
+      if (!tgl) return;
+      var next = addYears(tgl, 1);
+      var el = document.getElementById('p-nextJatuhTempo');
+      el.value = next;
+      el.classList.add('auto-filled');
+      var b = document.getElementById('badge-nextPajak');
+      b.style.display = 'inline-flex';
+      b.style.animation = 'none';
+      setTimeout(function () { b.style.animation = '' }, 10);
+    }
+    function autoNextStnk() {
+      var tgl = document.getElementById('p-tglStnk').value;
+      if (!tgl) return;
+      var next = addYears(tgl, 5);
+      var el = document.getElementById('p-nextJatuhTempoStnk');
+      el.value = next;
+      el.classList.add('auto-filled');
+      var b = document.getElementById('badge-nextStnk');
+      if (b) {
+        b.style.display = 'inline-flex';
+        b.style.animation = 'none';
+        setTimeout(function () { b.style.animation = '' }, 10);
+      }
+    }
+    function autoNextPajakFromTempo() {
+      var tempo = document.getElementById('p-jatuhTempo').value;
+      var tglBayar = document.getElementById('p-tglBayar').value;
+      var el = document.getElementById('p-nextJatuhTempo');
+      if (tempo && !el.value && !tglBayar) {
+        var next = addYears(tempo, 1);
+        el.value = next;
+        el.classList.add('auto-filled');
+        var b = document.getElementById('badge-nextPajak');
+        if (b) {
+          b.style.display = 'inline-flex';
+          b.style.animation = 'none';
+          setTimeout(function () { b.style.animation = '' }, 10);
+        }
+      }
+    }
+    function autoNextStnkFromTempo() {
+      var tempo = document.getElementById('p-jatuhTempoStnk').value;
+      var tglStnk = document.getElementById('p-tglStnk').value;
+      var el = document.getElementById('p-nextJatuhTempoStnk');
+      if (tempo && !el.value && !tglStnk) {
+        var next = addYears(tempo, 5);
+        el.value = next;
+        el.classList.add('auto-filled');
+        var b = document.getElementById('badge-nextStnk');
+        if (b) {
+          b.style.display = 'inline-flex';
+          b.style.animation = 'none';
+          setTimeout(function () { b.style.animation = '' }, 10);
+        }
+      }
+    }
+    function addMonths(dateStr, months) {
+      if (!dateStr) return '';
+      var d = new Date(dateStr);
+      d.setMonth(d.getMonth() + months);
+      return d.toISOString().split('T')[0];
+    }
+    function autoNextSewa() {
+      var ket = document.getElementById('s-keterangan').value;
+      var tglMulai = document.getElementById('s-tglMulai').value;
+      if (!tglMulai || !ket) return;
+
+      var months = 0;
+      if (ket === 'Sewa Tahunan') months = 12;
+      else if (ket === 'Sewa 6 Bulan') months = 6;
+      else if (ket === 'Sewa 3 Bulan') months = 3;
+      else if (ket === 'Sewa Bulanan') months = 1;
+
+      if (months > 0) {
+        var nextDate = addMonths(tglMulai, months);
+        var el = document.getElementById('s-tglBerakhir');
+        el.value = nextDate;
+        el.classList.add('auto-filled');
+
+        var badge = document.getElementById('badge-nextSewa');
+        if (badge) {
+          badge.textContent = '⚡ Otomatis +' + (months === 12 ? '1 Tahun' : months + ' Bulan');
+          badge.style.display = 'inline-flex';
+          badge.style.animation = 'none';
+          setTimeout(function () { badge.style.animation = '' }, 10);
+        }
+      }
+    }
+
+    /* ─── PAJAK CRUD ─────────────────────────── */
+    function savePajak() {
+      var nu = document.getElementById('p-namaUnit').value.trim();
+      var np = document.getElementById('p-nopol').value.trim().toUpperCase();
+      var an = document.getElementById('p-atasNama').value.trim();
+      var jt = document.getElementById('p-jatuhTempo').value;
+      if (!nu || !np || !an || !jt) { toast('Harap isi semua field wajib (*)', 'err'); return }
+      var d = {
+        id: editId.pajak || uid(),
+        namaUnit: nu, nopol: np, atasNama: an,
+        warna: document.getElementById('p-warna').value.trim(),
+        jatuhTempo: jt,
+        nominal: rawVal('p-nominal'),
+        tglBayar: document.getElementById('p-tglBayar').value,
+        nextJatuhTempo: document.getElementById('p-nextJatuhTempo').value,
+        jatuhTempoStnk: document.getElementById('p-jatuhTempoStnk').value,
+        nominalStnk: rawVal('p-nominalStnk'),
+        tglStnk: document.getElementById('p-tglStnk').value,
+        nextJatuhTempoStnk: document.getElementById('p-nextJatuhTempoStnk').value,
+        keterangan: document.getElementById('p-keterangan').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      if (!d.createdAt) d.createdAt = new Date().toISOString();
+
+      // Simpan optimistis ke state lokal dulu agar UI responsif
+      var isEdit = !!editId.pajak;
+      if (isEdit) { var ix = S.pajak.findIndex(function (x) { return x.id === editId.pajak }); if (ix !== -1) S.pajak[ix] = d; }
+      else { S.pajak.unshift(d); }
+      closeModal('pajak'); renderPajak(); badges();
+      saveLocalCache();
+
+      callGasApi('saveRecord', { type: 'pajak', data: d }, function (r) {
+        if (r && r.success) {
+          toast(isEdit ? 'Data kendaraan diperbarui!' : 'Kendaraan berhasil ditambahkan!');
+          clearLocalCache();
+        } else {
+          toast('⚠️ Tersimpan lokal, gagal ke Sheet: ' + ((r && r.message) || 'Cek URL GAS'), 'warn');
+        }
+      }, function (e) {
+        toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+    function delPajak(id) {
+      if (!confirm('Hapus data kendaraan ini?')) return;
+      S.pajak = S.pajak.filter(function (x) { return x.id !== id });
+      renderPajak(); badges();
+      saveLocalCache();
+      callGasApi('deleteRecord', { type: 'pajak', id: id }, function (r) {
+        if (r && r.success) { toast('Kendaraan dihapus.', 'warn'); clearLocalCache(); }
+        else toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet', 'warn');
+      }, function (e) {
+        toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+    /* ─── HITUNG TUNGGAKAN PAJAK KUMULATIF ─────────────────────────────────── */
+    // Pajak kendaraan bersifat tahunan. Jika belum dibayar beberapa tahun,
+    // estimasi tunggakan = nominal × jumlah tahun yang terlewat.
+    function hitungTunggakanPajak(d) {
+      var dd = daysTo(d.jatuhTempo);
+      if (!d.jatuhTempo || dd >= 0) return 0; // belum expired → tidak ada tunggakan
+      var nominal = parseInt(d.nominal) || 0;
+      if (!nominal) return 0;
+      var tahunLewat = Math.ceil(Math.abs(dd) / 365);
+      return nominal * tahunLewat;
+    }
+    function renderPajak() {
+      var q = (document.getElementById('q-pajak').value || '').toLowerCase();
+      var sf = document.getElementById('f-pajak-sts').value;
+      var list = document.getElementById('list-pajak');
+      var fd = S.pajak.filter(function (d) {
+        var m = (d.namaUnit || '').toLowerCase().includes(q) || (d.nopol || '').toLowerCase().includes(q) || (d.atasNama || '').toLowerCase().includes(q);
+        if (!m) return false;
+        if (sf && sts(daysTo(d.jatuhTempo)).cls !== sf) return false;
+        return true;
+      });
+      if (!fd.length) {
+        list.innerHTML = '<div class="empty"><div class="empty-icon"><i class="fa-solid fa-car"></i></div><div class="empty-title">Tidak ada data ditemukan</div><div class="empty-desc">Coba ubah filter atau kata kunci pencarian</div></div>';
+      } else {
+        list.innerHTML = fd.map(function (d) {
+          var st = sts(daysTo(d.jatuhTempo));
+          var stStnk = d.jatuhTempoStnk ? sts(daysTo(d.jatuhTempoStnk)) : null;
+          var tunggakan = hitungTunggakanPajak(d);
+          var tahunLewat = d.jatuhTempo && daysTo(d.jatuhTempo) < 0 ? Math.ceil(Math.abs(daysTo(d.jatuhTempo)) / 365) : 0;
+          return '<div class="entry">' +
+            '<div class="entry-top">' +
+            '<div class="entry-meta">' +
+            '<div class="entry-label"><i class="fa-solid fa-car-side" style="color:var(--gold);margin-right:5px"></i>Kendaraan</div>' +
+            '<div class="entry-name">' + esc(d.namaUnit) + '</div>' +
+            '<div class="entry-sub"><strong>' + esc(d.nopol) + '</strong> &nbsp;·&nbsp; Pengguna: <strong>' + esc(d.atasNama) + '</strong>' + (d.warna ? ' &nbsp;·&nbsp; ' + esc(d.warna) : '') + ' </div>' +
+            '</div>' +
+            '<div class="entry-right">' +
+            '<span class="pill pill-' + st.cls + '"><i class="fa-solid fa-circle"></i>' + st.label + '</span>' +
+            '<button class="btn btn-icon btn-edit-ic" onclick="openModal(\'pajak\',\'' + d.id + '\')" title="Edit"><i class="fa-solid fa-pen"></i></button>' +
+            '<button class="btn btn-icon btn-del-ic" onclick="delPajak(\'' + d.id + '\')" title="Hapus"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+            '</div>' +
+            '<div class="entry-grid">' +
+            '<div><div class="ef-label">Jatuh Tempo Pajak</div><div class="ef-val ' + st.cls + '">' + fdate(d.jatuhTempo) + '</div></div>' +
+            '<div><div class="ef-label">Tgl Pembayaran Pajak</div><div class="ef-val">' + fdate(d.tglBayar) + '</div></div>' +
+            '<div><div class="ef-label">Nominal Pajak / Tahun</div><div class="ef-val gold">' + cur(d.nominal) + '</div></div>' +
+            (tunggakan > 0 ?
+              '<div style="grid-column:1/-1;background:rgba(224,91,91,0.08);border:1px solid rgba(224,91,91,0.25);border-radius:10px;padding:10px 14px;margin-top:4px">' +
+              '<div class="ef-label" style="color:var(--rose)"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i>Estimasi Tunggakan (' + tahunLewat + ' tahun)</div>' +
+              '<div class="ef-val" style="color:var(--rose);font-size:15px;font-weight:800">' + cur(tunggakan) + '</div>' +
+              '<div style="font-size:10.5px;color:var(--text-3);margin-top:3px">' + cur(parseInt(d.nominal) || 0) + ' &times; ' + tahunLewat + ' tahun belum dibayar</div>' +
+              '</div>'
+              : '') +
+            (d.nextJatuhTempo ? '<div><div class="ef-label" style="color:var(--amber)">Tempo Pajak Selanjutnya</div><div class="ef-val segera" style="color:var(--amber)">' + fdate(d.nextJatuhTempo) + '</div></div>' : '') +
+            '<div style="grid-column:1/-1;height:1px;background:var(--border);margin:4px 0"></div>' +
+            '<div><div class="ef-label">Jatuh Tempo STNK <span style="color:var(--text-3);font-weight:500">(5 thn)</span></div><div class="ef-val ' + (stStnk ? stStnk.cls : '') + '">' + fdate(d.jatuhTempoStnk) + '</div></div>' +
+            '<div><div class="ef-label">Tgl Pembayaran STNK</div><div class="ef-val">' + fdate(d.tglStnk) + '</div></div>' +
+            '<div><div class="ef-label">Nominal STNK</div><div class="ef-val gold">' + cur(d.nominalStnk) + '</div></div>' +
+            (d.nextJatuhTempoStnk ? '<div><div class="ef-label" style="color:var(--amber)">Tempo STNK Selanjutnya</div><div class="ef-val segera" style="color:var(--amber)">' + fdate(d.nextJatuhTempoStnk) + '</div></div>' : '') +
+            (d.keterangan ? '<div style="grid-column:1/-1"><div class="ef-label">Keterangan</div><div class="ef-val">' + esc(d.keterangan) + '</div></div>' : '') +
+            (st.cls === 'expired' || st.cls === 'segera' || tunggakan > 0 ?
+              '<div style="grid-column:1/-1;margin-top:10px">' +
+              '<button class="btn btn-gold" style="width:100%;justify-content:center;background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;font-weight:700;padding:10px 14px;box-shadow:0 4px 14px rgba(43,181,160,0.25)" onclick="openConfirmPajakModal(\'' + d.id + '\')">' +
+              '<i class="fa-solid fa-circle-check"></i> Konfirmasi Pembayaran Pajak' +
+              '</button>' +
+              '</div>'
+              : '') +
+            '</div>' +
+            '</div>';
+        }).join('');
+      }
+      // stats
+      var tn = S.pajak.reduce(function (a, d) { return a + (parseInt(d.nominal) || 0) }, 0);
+      var nomSegera = S.pajak.reduce(function (a, d) {
+        var sum = 0;
+        var ddPajak = daysTo(d.jatuhTempo);
+        if (ddPajak >= 0 && ddPajak <= 30) sum += (parseInt(d.nominal) || 0);
+        var ddStnk = daysTo(d.jatuhTempoStnk);
+        if (ddStnk >= 0 && ddStnk <= 30) sum += (parseInt(d.nominalStnk) || 0);
+        return a + sum;
+      }, 0);
+      // Hitung total estimasi tunggakan semua kendaraan
+      var totalTunggakan = S.pajak.reduce(function (a, d) { return a + hitungTunggakanPajak(d); }, 0);
+      document.getElementById('s-total-k').textContent = S.pajak.length;
+      document.getElementById('s-pajak-segera').textContent = S.pajak.filter(function (d) { var dd = daysTo(d.jatuhTempo); return dd >= 0 && dd <= 30 }).length;
+      document.getElementById('s-nom-segera').textContent = cur(nomSegera);
+      document.getElementById('s-pajak-exp').textContent = S.pajak.filter(function (d) { return daysTo(d.jatuhTempo) < 0 }).length;
+      document.getElementById('s-nom-pajak').textContent = cur(tn);
+      // Tampilkan stat tunggakan hanya jika ada
+      var wrapTunggakan = document.getElementById('stat-tunggakan-wrap');
+      if (wrapTunggakan) {
+        wrapTunggakan.style.display = totalTunggakan > 0 ? '' : 'none';
+        document.getElementById('s-nom-tunggakan').textContent = cur(totalTunggakan);
+      }
+    }
+
+    /* ─── KONFIRMASI PEMBAYARAN PAJAK ───────────────────────── */
+    function openConfirmPajakModal(id) {
+      var d = S.pajak.find(function (x) { return x.id === id });
+      if (!d) return;
+      document.getElementById('cp-id').value = id;
+      document.getElementById('cp-unit-name').textContent = d.namaUnit;
+      document.getElementById('cp-unit-sub').textContent = d.nopol + ' · Pengguna: ' + d.atasNama;
+      document.getElementById('cp-due-date').textContent = fdate(d.jatuhTempo);
+
+      var tunggakan = hitungTunggakanPajak(d);
+      var target = tunggakan > 0 ? tunggakan : (parseInt(d.nominal) || 0);
+      document.getElementById('cp-due-nominal').textContent = cur(target);
+
+      var st = sts(daysTo(d.jatuhTempo));
+      var pillEl = document.getElementById('cp-status-pill');
+      if (pillEl) {
+        pillEl.className = 'pill pill-' + st.cls;
+        pillEl.innerHTML = '<i class="fa-solid fa-circle"></i> ' + st.label;
+      }
+
+      document.getElementById('cp-tglBayar').value = new Date().toISOString().split('T')[0];
+      setFmt('cp-nominal', target);
+      document.getElementById('cp-catatan').value = '';
+
+      calcConfirmPajak();
+      document.getElementById('ov-confirm-pajak').classList.add('open');
+    }
+
+    function checkCustomExcessReason() {
+      var sel = document.getElementById('cp-excess-reason').value;
+      var customInput = document.getElementById('cp-excess-reason-custom');
+      if (customInput) customInput.style.display = sel === 'Lainnya' ? 'block' : 'none';
+    }
+
+    function calcConfirmPajak() {
+      var id = document.getElementById('cp-id').value;
+      var d = S.pajak.find(function (x) { return x.id === id });
+      if (!d) return;
+
+      var tglBayar = document.getElementById('cp-tglBayar').value;
+      var nominalBayar = rawVal('cp-nominal');
+
+      var tunggakan = hitungTunggakanPajak(d);
+      var target = tunggakan > 0 ? tunggakan : (parseInt(d.nominal) || 0);
+
+      var diff = nominalBayar - target;
+      var diffBadge = document.getElementById('cp-diff-badge');
+      var excessWrap = document.getElementById('cp-excess-wrap');
+      var excessLbl = document.getElementById('cp-excess-amount-lbl');
+
+      if (diff === 0) {
+        diffBadge.innerHTML = '<span style="color:var(--emerald)"><i class="fa-solid fa-circle-check"></i> Sesuai Tagihan (Pas)</span>';
+        if (excessWrap) excessWrap.style.display = 'none';
+      } else if (diff > 0) {
+        diffBadge.innerHTML = '<span style="color:var(--amber)"><i class="fa-solid fa-plus"></i> Lebih ' + cur(diff) + '</span>';
+        if (excessWrap) excessWrap.style.display = 'block';
+        if (excessLbl) excessLbl.textContent = cur(diff);
+      } else {
+        diffBadge.innerHTML = '<span style="color:var(--rose)"><i class="fa-solid fa-minus"></i> Kurang ' + cur(Math.abs(diff)) + ' (Masih Ada Sisa Tagihan)</span>';
+        if (excessWrap) excessWrap.style.display = 'none';
+      }
+
+      var nextDateEl = document.getElementById('cp-next-date');
+      if (tglBayar) {
+        var newJatuhTempo = addYears(tglBayar, 1);
+        nextDateEl.textContent = fdate(newJatuhTempo);
+      } else {
+        nextDateEl.textContent = '–';
+      }
+    }
+
+    function processConfirmPajak() {
+      var id = document.getElementById('cp-id').value;
+      var d = S.pajak.find(function (x) { return x.id === id });
+      if (!d) return;
+
+      var tglBayar = document.getElementById('cp-tglBayar').value;
+      var nominalBayar = rawVal('cp-nominal');
+      var catatan = document.getElementById('cp-catatan').value.trim();
+
+      if (!tglBayar || !nominalBayar) {
+        toast('Harap isi Tanggal Realisasi Pembayaran dan Nominal Realisasi (*)', 'err');
+        return;
+      }
+
+      var tunggakan = hitungTunggakanPajak(d);
+      var target = tunggakan > 0 ? tunggakan : (parseInt(d.nominal) || 0);
+      var diff = nominalBayar - target;
+
+      var reasonStr = '';
+      if (diff > 0) {
+        var selReason = document.getElementById('cp-excess-reason').value;
+        if (selReason === 'Lainnya') {
+          reasonStr = document.getElementById('cp-excess-reason-custom').value.trim();
+          if (!reasonStr) {
+            toast('Harap tuliskan sebab kelebihan pembayaran (*)', 'err');
+            return;
+          }
+        } else {
+          reasonStr = selReason;
+        }
+      }
+
+      var nextJatuhTempo = addYears(tglBayar, 1);
+      var nextJatuhTempo2 = addYears(tglBayar, 2);
+
+      d.tglBayar = tglBayar;
+      d.nominal = nominalBayar;
+      d.jatuhTempo = nextJatuhTempo;
+      d.nextJatuhTempo = nextJatuhTempo2;
+      d.updatedAt = new Date().toISOString();
+
+      var note = '[Lunas Pajak ' + fdate(tglBayar) + ': ' + cur(nominalBayar) + ']';
+      if (diff > 0 && reasonStr) {
+        note += ' | Kelebihan ' + cur(diff) + ' (' + reasonStr + ')';
+      }
+      if (catatan) note += ' - ' + catatan;
+
+      d.keterangan = d.keterangan ? (d.keterangan + ' | ' + note) : note;
+
+      closeModal('confirm-pajak');
+      renderPajak();
+      badges();
+      saveLocalCache();
+
+      callGasApi('saveRecord', { type: 'pajak', data: d }, function (r) {
+        if (r && r.success) {
+          toast('🎉 Pembayaran Pajak ' + esc(d.namaUnit) + ' berhasil dikonfirmasi!', 'ok');
+          clearLocalCache();
+        } else {
+          toast('⚠️ Tersimpan lokal, gagal kirim ke Sheet: ' + ((r && r.message) || ''), 'warn');
+        }
+      }, function (e) {
+        toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+
+    function filterBelumBayar() {
+      document.getElementById('f-pajak-sts').value = 'expired';
+      renderPajak();
+      toast('Menampilkan daftar kendaraan yang belum dibayar / expired', 'warn');
+    }
+
+    /* ─── SEWA CRUD ──────────────────────────── */
+    function saveSewa() {
+      var nr = document.getElementById('s-namaRumah').value.trim();
+      var py = document.getElementById('s-namaPenyewa').value.trim();
+      var pm = document.getElementById('s-namaPemilik').value.trim();
+      var kt = document.getElementById('s-keterangan').value;
+      var tm = document.getElementById('s-tglMulai').value;
+      var tb = document.getElementById('s-tglBerakhir').value;
+      var by = rawVal('s-biaya');
+      if (!nr || !py || !pm || !kt || !tm || !tb || !by) { toast('Harap isi semua field wajib (*)', 'err'); return }
+      var d = {
+        id: editId.sewa || uid(),
+        namaRumah: nr, namaPenyewa: py, namaPemilik: pm, keterangan: kt, biaya: by,
+        tglMulai: tm, tglBerakhir: tb,
+        linkMou: document.getElementById('s-linkMou').value.trim(),
+        linkKondisi: document.getElementById('s-linkKondisi').value.trim(),
+        catatan: document.getElementById('s-catatan').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      if (!d.createdAt) d.createdAt = new Date().toISOString();
+
+      // Simpan optimistis ke state lokal dulu agar UI responsif
+      var isEdit = !!editId.sewa;
+      if (isEdit) { var ix = S.sewa.findIndex(function (x) { return x.id === editId.sewa }); if (ix !== -1) S.sewa[ix] = d; }
+      else { S.sewa.unshift(d); }
+      closeModal('sewa'); renderSewa(); badges();
+      saveLocalCache(); // simpan state saat ini ke cache
+
+      // Kirim ke Sheet (sumber kebenaran)
+      callGasApi('saveRecord', { type: 'sewa', data: d }, function (r) {
+        if (r && r.success) {
+          toast(isEdit ? 'Data sewa diperbarui!' : 'Data sewa berhasil ditambahkan!');
+          clearLocalCache(); // paksa refresh dari Sheet saat load berikutnya
+        } else {
+          toast('⚠️ Tersimpan lokal, gagal ke Sheet: ' + ((r && r.message) || 'Cek URL GAS'), 'warn');
+        }
+      }, function (e) {
+        toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+    function delSewa(id) {
+      if (!confirm('Hapus data sewa ini?')) return;
+      S.sewa = S.sewa.filter(function (x) { return x.id !== id });
+      renderSewa(); badges();
+      saveLocalCache();
+      callGasApi('deleteRecord', { type: 'sewa', id: id }, function (r) {
+        if (r && r.success) { toast('Data sewa dihapus.', 'warn'); clearLocalCache(); }
+        else toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet', 'warn');
+      }, function (e) {
+        toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+    /* ─── KONFIRMASI PERPANJANGAN SEWA RUMAH ─────────────────────── */
+    function selectSewaDecision(dec) {
+      document.getElementById('cs-decision').value = dec;
+      var btnPerpanjang = document.getElementById('cs-opt-perpanjang');
+      var btnSelesai = document.getElementById('cs-opt-selesai');
+      var boxPerpanjang = document.getElementById('cs-box-perpanjang');
+      var boxSelesai = document.getElementById('cs-box-selesai');
+      var btnSubmit = document.getElementById('cs-btn-submit');
+
+      if (dec === 'perpanjang') {
+        btnPerpanjang.style.background = 'linear-gradient(135deg,#2bb5a0,#3dba80)';
+        btnPerpanjang.style.color = '#0a1a12';
+        btnPerpanjang.style.border = 'none';
+        btnSelesai.style.background = 'transparent';
+        btnSelesai.style.color = 'var(--text-2)';
+        btnSelesai.style.border = '1px solid var(--border)';
+        boxPerpanjang.style.display = 'block';
+        boxSelesai.style.display = 'none';
+        btnSubmit.innerHTML = '<i class="fa-solid fa-circle-check"></i> Simpan Perpanjangan Kontrak';
+        btnSubmit.style.background = 'linear-gradient(135deg,#2bb5a0,#3dba80)';
+        btnSubmit.style.color = '#0a1a12';
+      } else {
+        btnSelesai.style.background = 'linear-gradient(135deg,#eb5e55,#d6453c)';
+        btnSelesai.style.color = '#ffffff';
+        btnSelesai.style.border = 'none';
+        btnPerpanjang.style.background = 'transparent';
+        btnPerpanjang.style.color = 'var(--text-2)';
+        btnPerpanjang.style.border = '1px solid var(--border)';
+        boxPerpanjang.style.display = 'none';
+        boxSelesai.style.display = 'block';
+        btnSubmit.innerHTML = '<i class="fa-solid fa-circle-stop"></i> Tandai Kontrak Selesai';
+        btnSubmit.style.background = 'linear-gradient(135deg,#eb5e55,#d6453c)';
+        btnSubmit.style.color = '#ffffff';
+      }
+    }
+
+    function openConfirmSewaModal(id) {
+      var d = S.sewa.find(function (x) { return x.id === id });
+      if (!d) return;
+
+      document.getElementById('cs-id').value = id;
+      document.getElementById('cs-unit-name').textContent = d.namaRumah;
+      document.getElementById('cs-unit-sub').textContent = 'Penyewa: ' + d.namaPenyewa + ' · Pemilik: ' + d.namaPemilik;
+      document.getElementById('cs-due-date').textContent = fdate(d.tglBerakhir);
+      document.getElementById('cs-due-nominal').textContent = cur(d.biaya);
+
+      var st = sts(daysTo(d.tglBerakhir));
+      var pillEl = document.getElementById('cs-status-pill');
+      if (pillEl) {
+        if (d.statusSewa === 'Selesai') {
+          pillEl.className = 'pill pill-expired';
+          pillEl.style.background = 'rgba(120,120,120,0.15)';
+          pillEl.style.color = 'var(--text-3)';
+          pillEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Kontrak Selesai';
+        } else {
+          pillEl.className = 'pill pill-' + st.cls;
+          pillEl.style.background = '';
+          pillEl.style.color = '';
+          pillEl.innerHTML = '<i class="fa-solid fa-circle"></i> ' + st.label;
+        }
+      }
+
+      document.getElementById('cs-keterangan').value = d.keterangan || 'Sewa Tahunan';
+      setFmt('cs-biaya', d.biaya);
+      document.getElementById('cs-tglMulai').value = d.tglBerakhir || new Date().toISOString().split('T')[0];
+      document.getElementById('cs-catatan-perpanjang').value = '';
+      document.getElementById('cs-catatan-selesai').value = '';
+
+      selectSewaDecision('perpanjang');
+      calcConfirmSewa();
+      document.getElementById('ov-confirm-sewa').classList.add('open');
+    }
+
+    function calcConfirmSewa() {
+      var ket = document.getElementById('cs-keterangan').value;
+      var tglMulai = document.getElementById('cs-tglMulai').value;
+      if (!tglMulai || !ket) return;
+
+      var months = 0;
+      if (ket === 'Sewa Tahunan') months = 12;
+      else if (ket === 'Sewa 6 Bulan') months = 6;
+      else if (ket === 'Sewa 3 Bulan') months = 3;
+      else if (ket === 'Sewa Bulanan') months = 1;
+
+      var nextDate = addMonths(tglMulai, months || 12);
+      document.getElementById('cs-tglBerakhir').value = nextDate;
+    }
+
+    function processConfirmSewa() {
+      var id = document.getElementById('cs-id').value;
+      var d = S.sewa.find(function (x) { return x.id === id });
+      if (!d) return;
+
+      var dec = document.getElementById('cs-decision').value;
+      if (dec === 'perpanjang') {
+        var ketBaru = document.getElementById('cs-keterangan').value;
+        var biayaBaru = rawVal('cs-biaya');
+        var tglMulaiBaru = document.getElementById('cs-tglMulai').value;
+        var tglBerakhirBaru = document.getElementById('cs-tglBerakhir').value;
+        var catatanExt = document.getElementById('cs-catatan-perpanjang').value.trim();
+
+        if (!tglMulaiBaru || !biayaBaru) {
+          toast('Harap isi Tanggal Mulai dan Biaya Sewa Perpanjangan (*)', 'err');
+          return;
+        }
+
+        d.keterangan = ketBaru;
+        d.biaya = biayaBaru;
+        d.tglMulai = tglMulaiBaru;
+        d.tglBerakhir = tglBerakhirBaru;
+        d.statusSewa = 'Aktif';
+        d.updatedAt = new Date().toISOString();
+
+        var note = '[Diperpanjang ' + fdate(tglMulaiBaru) + ' s/d ' + fdate(tglBerakhirBaru) + ': ' + cur(biayaBaru) + ']';
+        if (catatanExt) note += ' - ' + catatanExt;
+        d.catatan = d.catatan ? (d.catatan + ' | ' + note) : note;
+
+        closeModal('confirm-sewa');
+        renderSewa(); badges(); saveLocalCache();
+
+        callGasApi('saveRecord', { type: 'sewa', data: d }, function (r) {
+          if (r && r.success) {
+            toast('🎉 Perpanjangan Kontrak ' + esc(d.namaRumah) + ' berhasil disimpan!', 'ok');
+            clearLocalCache();
+          } else {
+            toast('⚠️ Tersimpan lokal, gagal ke Sheet: ' + ((r && r.message) || ''), 'warn');
+          }
+        }, function (e) {
+          toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+        });
+
+      } else {
+        var catatanEnd = document.getElementById('cs-catatan-selesai').value.trim();
+        d.statusSewa = 'Selesai';
+        d.updatedAt = new Date().toISOString();
+
+        var noteEnd = '[Kontrak Selesai pada ' + fdate(new Date().toISOString().split('T')[0]) + ']';
+        if (catatanEnd) noteEnd += ' - ' + catatanEnd;
+        d.catatan = d.catatan ? (d.catatan + ' | ' + noteEnd) : noteEnd;
+
+        closeModal('confirm-sewa');
+        renderSewa(); badges(); saveLocalCache();
+
+        callGasApi('saveRecord', { type: 'sewa', data: d }, function (r) {
+          if (r && r.success) {
+            toast('ℹ️ Kontrak ' + esc(d.namaRumah) + ' ditandai Selesai & diarsipkan.', 'warn');
+            clearLocalCache();
+          } else {
+            toast('⚠️ Tersimpan lokal, gagal ke Sheet: ' + ((r && r.message) || ''), 'warn');
+          }
+        }, function (e) {
+          toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+        });
+      }
+    }
+
+    function filterSewaByStatus(st) {
+      var el = document.getElementById('f-sewa-sts');
+      if (el) el.value = st;
+      renderSewa();
+      if (st) toast('Menampilkan data sewa rumah filter: ' + st, 'warn');
+    }
+
+    function renderSewa() {
+      var q = (document.getElementById('q-sewa').value || '').toLowerCase();
+      var kf = document.getElementById('f-sewa-ket').value;
+      var sf = document.getElementById('f-sewa-sts') ? document.getElementById('f-sewa-sts').value : '';
+      var list = document.getElementById('list-sewa');
+      var fd = S.sewa.filter(function (d) {
+        var m = (d.namaRumah || '').toLowerCase().includes(q) || (d.namaPenyewa || '').toLowerCase().includes(q) || (d.namaPemilik || '').toLowerCase().includes(q);
+        if (!m) return false;
+        if (kf && d.keterangan !== kf) return false;
+        if (sf) {
+          var isSelesai = d.statusSewa === 'Selesai';
+          var stCls = sts(daysTo(d.tglBerakhir)).cls;
+          if (sf === 'selesai' && !isSelesai) return false;
+          if (sf !== 'selesai' && isSelesai) return false;
+          if (sf !== 'selesai' && stCls !== sf) return false;
+        }
+        return true;
+      });
+      if (!fd.length) {
+        list.innerHTML = '<div class="empty"><div class="empty-icon"><i class="fa-solid fa-house-chimney"></i></div><div class="empty-title">Tidak ada data ditemukan</div><div class="empty-desc">Coba ubah filter atau kata kunci pencarian</div></div>';
+      } else {
+        list.innerHTML = fd.map(function (d) {
+          var st = sts(daysTo(d.tglBerakhir));
+          var isSelesai = d.statusSewa === 'Selesai';
+          var pillHtml = isSelesai ?
+            '<span class="pill pill-expired" style="background:rgba(120,120,120,0.15);color:var(--text-3);border:1px solid rgba(120,120,120,0.3)"><i class="fa-solid fa-circle-check"></i> Kontrak Selesai</span>' :
+            '<span class="pill pill-' + st.cls + '"><i class="fa-solid fa-circle"></i>' + st.label + '</span>';
+
+          var showConfirmBtn = true;
+          var confirmBtnHtml = showConfirmBtn ?
+            '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">' +
+            '<button class="btn btn-emerald" onclick="openConfirmSewaModal(\'' + d.id + '\')" style="background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:10px;box-shadow:0 2px 8px rgba(61,186,128,0.2)">' +
+            '<i class="fa-solid fa-file-circle-check"></i> Konfirmasi Perpanjangan / Selesai Sewa' +
+            '</button>' +
+            '</div>' : '';
+
+          return '<div class="entry">' +
+            '<div class="entry-top">' +
+            '<div class="entry-meta">' +
+            '<div class="entry-label"><i class="fa-solid fa-house-chimney" style="color:var(--gold);margin-right:5px"></i>Rumah Sewa</div>' +
+            '<div class="entry-name">' + esc(d.namaRumah) + '</div>' +
+            '<div class="entry-sub">Penyewa: <strong>' + esc(d.namaPenyewa) + '</strong> &nbsp;·&nbsp; Pemilik: <strong>' + esc(d.namaPemilik) + '</strong></div>' +
+            '</div>' +
+            '<div class="entry-right">' +
+            pillHtml +
+            '<button class="btn btn-icon btn-edit-ic" onclick="openModal(\'sewa\',\'' + d.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+            '<button class="btn btn-icon btn-del-ic" onclick="delSewa(\'' + d.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+            '</div>' +
+            '<div class="entry-grid">' +
+            '<div><div class="ef-label">Keterangan Sewa</div><div class="ef-val">' + esc(d.keterangan) + '</div></div>' +
+            '<div><div class="ef-label">Biaya Sewa</div><div class="ef-val gold">' + cur(d.biaya) + '</div></div>' +
+            '<div><div class="ef-label">Mulai Sewa</div><div class="ef-val">' + fdate(d.tglMulai) + '</div></div>' +
+            '<div><div class="ef-label">Berakhir Sewa</div><div class="ef-val ' + (isSelesai ? '' : st.cls) + '">' + fdate(d.tglBerakhir) + '</div></div>' +
+            (d.linkMou ? '<div><div class="ef-label">Dokumen MOU</div><div class="ef-val"><a href="' + esc(d.linkMou) + '" target="_blank" rel="noopener"><i class="fa-brands fa-google-drive"></i> Buka MOU</a></div></div>' : '') +
+            (d.linkKondisi ? '<div><div class="ef-label">Kondisi Awal</div><div class="ef-val"><a href="' + esc(d.linkKondisi) + '" target="_blank" rel="noopener"><i class="fa-brands fa-google-drive"></i> Lihat Foto</a></div></div>' : '') +
+            (d.catatan ? '<div style="grid-column:1/-1"><div class="ef-label">Catatan & Histori</div><div class="ef-val">' + esc(d.catatan) + '</div></div>' : '') +
+            '</div>' +
+            confirmBtnHtml +
+            '</div>';
+        }).join('');
+      }
+      // stats
+      var activeSewa = S.sewa.filter(function (d) { return d.statusSewa !== 'Selesai' });
+      var tb2 = S.sewa.reduce(function (a, d) { return a + (parseInt(d.biaya) || 0) }, 0);
+      var nomSewaSegera = activeSewa.reduce(function (a, d) {
+        var dd = daysTo(d.tglBerakhir);
+        return (dd <= 30) ? a + (parseInt(d.biaya) || 0) : a;
+      }, 0);
+      document.getElementById('s-total-s').textContent = S.sewa.length;
+      document.getElementById('s-sewa-segera').textContent = activeSewa.filter(function (d) { var dd = daysTo(d.tglBerakhir); return dd >= 0 && dd <= 30 }).length;
+      document.getElementById('s-nom-sewa-segera').textContent = cur(nomSewaSegera);
+      document.getElementById('s-sewa-exp').textContent = activeSewa.filter(function (d) { return daysTo(d.tglBerakhir) < 0 }).length;
+      document.getElementById('s-biaya-sewa').textContent = cur(tb2);
+    }
+
+    /* ─── BADGES ────────────────────────────── */
+    function badges() {
+      document.getElementById('cnt-pajak').textContent = S.pajak.length;
+      document.getElementById('cnt-sewa').textContent = S.sewa.length;
+    }
+
+    /* ─── ADMIN ─────────────────────────────── */
+    function renderEmails() {
+      renderEmailsPajak();
+      renderEmailsSewa();
+    }
+
+    function renderEmailsPajak() {
+      var c = document.getElementById('emailTagsPajak');
+      if (!c) return;
+      if (!S.admin.emailsPajak) S.admin.emailsPajak = (S.admin.emails || []).slice();
+      if (!S.admin.emailsPajak.length) { c.innerHTML = '<span class="no-email">Belum ada email terdaftar untuk kendaraan.</span>'; return }
+      c.innerHTML = S.admin.emailsPajak.map(function (em, i) {
+        return '<span class="etag"><i class="fa-solid fa-envelope" style="color:var(--gold)"></i>' + esc(em) + '<button class="etag-del" onclick="removeEmailPajak(' + i + ')" title="Hapus">&#x2715;</button></span>'
+      }).join('');
+    }
+
+    function addEmailPajak() {
+      var raw = document.getElementById('inputEmailPajak').value;
+      var v = raw.trim();
+      if (!v) { toast('Email tidak boleh kosong', 'err'); return }
+      if (raw !== raw.trim() || /\s/.test(v)) { toast('Format email tidak valid – hapus spasi di depan/belakang', 'err'); return }
+      if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) { toast('Format email tidak valid – pastikan ada @ dan domain (contoh: nama@gmail.com)', 'err'); return }
+      if (!S.admin.emailsPajak) S.admin.emailsPajak = [];
+      if (S.admin.emailsPajak.indexOf(v) !== -1) { toast('Email sudah terdaftar di kategori kendaraan', 'warn'); return }
+      S.admin.emailsPajak.push(v);
+      document.getElementById('inputEmailPajak').value = '';
+      renderEmailsPajak(); toast('Email kendaraan ditambahkan!');
+    }
+
+    function removeEmailPajak(i) {
+      if (S.admin.emailsPajak) S.admin.emailsPajak.splice(i, 1);
+      renderEmailsPajak(); toast('Email kendaraan dihapus.', 'warn');
+    }
+
+    function renderEmailsSewa() {
+      var c = document.getElementById('emailTagsSewa');
+      if (!c) return;
+      if (!S.admin.emailsSewa) S.admin.emailsSewa = (S.admin.emails || []).slice();
+      if (!S.admin.emailsSewa.length) { c.innerHTML = '<span class="no-email">Belum ada email terdaftar untuk sewa rumah.</span>'; return }
+      c.innerHTML = S.admin.emailsSewa.map(function (em, i) {
+        return '<span class="etag"><i class="fa-solid fa-envelope" style="color:var(--teal)"></i>' + esc(em) + '<button class="etag-del" onclick="removeEmailSewa(' + i + ')" title="Hapus">&#x2715;</button></span>'
+      }).join('');
+    }
+
+    function addEmailSewa() {
+      var raw = document.getElementById('inputEmailSewa').value;
+      var v = raw.trim();
+      if (!v) { toast('Email tidak boleh kosong', 'err'); return }
+      if (raw !== raw.trim() || /\s/.test(v)) { toast('Format email tidak valid – hapus spasi di depan/belakang', 'err'); return }
+      if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) { toast('Format email tidak valid – pastikan ada @ dan domain (contoh: nama@gmail.com)', 'err'); return }
+      if (!S.admin.emailsSewa) S.admin.emailsSewa = [];
+      if (S.admin.emailsSewa.indexOf(v) !== -1) { toast('Email sudah terdaftar di kategori sewa', 'warn'); return }
+      S.admin.emailsSewa.push(v);
+      document.getElementById('inputEmailSewa').value = '';
+      renderEmailsSewa(); toast('Email sewa rumah ditambahkan!');
+    }
+
+    function removeEmailSewa(i) {
+      if (S.admin.emailsSewa) S.admin.emailsSewa.splice(i, 1);
+      renderEmailsSewa(); toast('Email sewa rumah dihapus.', 'warn');
+    }
+
+    // Fallback aliases
+    function addEmail() { addEmailPajak(); }
+    function removeEmail(i) { removeEmailPajak(i); }
+    function setRv(id, vid) { document.getElementById(vid).textContent = document.getElementById(id).value }
+    /* ─── LOCAL STORAGE (CACHE SAJA – bukan master) ─────────────────────────── */
+    // localStorage hanya dipakai sebagai CACHE sementara saat offline.
+    // Google Sheet adalah satu-satunya sumber kebenaran (single source of truth).
+    function saveLocalCache() {
+      try {
+        localStorage.setItem('riayah_admin', JSON.stringify(S.admin));
+        localStorage.setItem('riayah_pajak', JSON.stringify(S.pajak));
+        localStorage.setItem('riayah_sewa', JSON.stringify(S.sewa));
+        localStorage.setItem('riayah_cache_ts', Date.now().toString());
+      } catch (e) { }
+    }
+    function loadLocalCache() {
+      // Cache hanya valid 10 menit; lewat itu selalu ambil dari Sheet
+      try {
+        var ts = localStorage.getItem('riayah_cache_ts');
+        if (!ts || (Date.now() - parseInt(ts)) > 10 * 60 * 1000) return false;
+        var la = localStorage.getItem('riayah_admin'); if (la) Object.assign(S.admin, JSON.parse(la));
+        var lp = localStorage.getItem('riayah_pajak'); if (lp) S.pajak = JSON.parse(lp);
+        var ls = localStorage.getItem('riayah_sewa'); if (ls) S.sewa = JSON.parse(ls);
+        return true;
+      } catch (e) { return false; }
+    }
+    function clearLocalCache() {
+      try {
+        ['riayah_admin', 'riayah_pajak', 'riayah_sewa', 'riayah_cache_ts'].forEach(function (k) { localStorage.removeItem(k); });
+      } catch (e) { }
+    }
+
+    function populateAdminForm() {
+      if (!S.admin) return;
+      document.getElementById('rPajak').value = S.admin.rangePajak || 30;
+      document.getElementById('rSewa').value = S.admin.rangeSewa || 30;
+      document.getElementById('rStnk').value = S.admin.rangeStnk || 14;
+      document.getElementById('vPajak').textContent = S.admin.rangePajak || 30;
+      document.getElementById('vSewa').textContent = S.admin.rangeSewa || 30;
+      document.getElementById('vStnk').textContent = S.admin.rangeStnk || 14;
+      document.getElementById('selFreq').value = S.admin.frequency || 'daily';
+      document.getElementById('tgPajak').checked = !!(S.admin.togglePajak !== undefined ? S.admin.togglePajak : S.admin.tgPajak);
+      document.getElementById('tgStnk').checked = !!(S.admin.toggleStnk !== undefined ? S.admin.toggleStnk : S.admin.tgStnk);
+      document.getElementById('tgSewa').checked = !!(S.admin.toggleSewa !== undefined ? S.admin.toggleSewa : S.admin.tgSewa);
+      document.getElementById('tgMonthly').checked = !!(S.admin.toggleMonthly !== undefined ? S.admin.toggleMonthly : S.admin.tgMonthly);
+      document.getElementById('tgSeparate').checked = !!(S.admin.toggleSeparate !== undefined ? S.admin.toggleSeparate : S.admin.tgSeparate);
+      document.getElementById('adminPinInput').value = S.admin.pin || '1234';
+      renderEmails();
+    }
+
+    function saveAdmin() {
+      S.admin.rangePajak = +document.getElementById('rPajak').value;
+      S.admin.rangeSewa = +document.getElementById('rSewa').value;
+      S.admin.rangeStnk = +document.getElementById('rStnk').value;
+      S.admin.frequency = document.getElementById('selFreq').value;
+      S.admin.tgPajak = document.getElementById('tgPajak').checked;
+      S.admin.tgStnk = document.getElementById('tgStnk').checked;
+      S.admin.tgSewa = document.getElementById('tgSewa').checked;
+      S.admin.tgMonthly = document.getElementById('tgMonthly').checked;
+      S.admin.tgSeparate = document.getElementById('tgSeparate').checked;
+      S.admin.togglePajak = S.admin.tgPajak;
+      S.admin.toggleStnk = S.admin.tgStnk;
+      S.admin.toggleSewa = S.admin.tgSewa;
+      S.admin.toggleMonthly = S.admin.tgMonthly;
+      S.admin.toggleSeparate = S.admin.tgSeparate;
+      var newPin = document.getElementById('adminPinInput').value.trim();
+      if (newPin) S.admin.pin = newPin;
+
+      saveLocalCache(); // ✅ diperbaiki dari saveLocal() yang tidak ada
+
+      var btn = document.getElementById('btnSaveAdmin');
+      btn.innerHTML = '<span class="spin" style="border-top-color:var(--bg-0)"></span> Menyimpan…'; btn.disabled = true;
+
+      callGasApi('saveAdminSettings', S.admin, function (r) {
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan';
+        btn.disabled = false;
+        if (r && r.success) {
+          showSaveSuccessNotif();
+        } else {
+          toast((r && r.message) || 'Pengaturan disimpan lokal (Gagal ke Sheet/URL API)', 'warn');
+        }
+      }, function (e) {
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan';
+        btn.disabled = false;
+        toast('Gagal ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+
+    function showSaveSuccessNotif() {
+      // Hapus notif lama jika ada
+      var old = document.getElementById('saveSuccessNotif');
+      if (old) old.remove();
+
+      var freq = document.getElementById('selFreq');
+      var freqLabel = freq ? freq.options[freq.selectedIndex].text : '';
+
+      var notif = document.createElement('div');
+      notif.id = 'saveSuccessNotif';
+      notif.style.cssText = [
+        'position:fixed', 'top:80px', 'right:24px', 'z-index:9999',
+        'background:linear-gradient(135deg,#0d2a10,#122015)',
+        'border:1px solid rgba(93,166,74,0.45)',
+        'border-radius:16px', 'padding:20px 24px',
+        'min-width:320px', 'max-width:380px',
+        'box-shadow:0 8px 40px rgba(0,0,0,0.55),0 0 0 1px rgba(93,166,74,0.15)',
+        'animation:slideInRight 0.35s cubic-bezier(0.34,1.56,0.64,1) both'
+      ].join(';');
+      notif.innerHTML =
+        '<div style="display:flex;align-items:flex-start;gap:14px">' +
+        '<div style="width:40px;height:40px;background:linear-gradient(135deg,#3dba80,#5da64a);border-radius:10px;' +
+        'display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>' +
+        '<div style="flex:1">' +
+        '<div style="font-size:14px;font-weight:800;color:#7ecf65;margin-bottom:4px">Pengaturan Berhasil Disimpan!</div>' +
+        '<div style="font-size:12px;color:#9cbf90;line-height:1.6">' +
+        'Reminder otomatis aktif &nbsp;·&nbsp; <strong style="color:#e8c97a">' + freqLabel + '</strong>' +
+        '</div>' +
+        '<div style="font-size:11px;color:#5a8050;margin-top:6px">' +
+        '<i class="fa-solid fa-circle-check" style="margin-right:4px"></i>Email akan dikirim sesuai jadwal' +
+        '</div>' +
+        '</div>' +
+        '<button onclick="var n=document.getElementById(\'saveSuccessNotif\');if(n)n.remove();" ' +
+        'style="background:none;border:none;color:#5a8050;cursor:pointer;font-size:16px;padding:0;line-height:1">✕</button>' +
+        '</div>';
+
+      document.body.appendChild(notif);
+
+      // Auto-hilang setelah 5 detik
+      setTimeout(function () {
+        if (notif.parentNode) {
+          notif.style.animation = 'slideOutRight 0.3s ease forwards';
+          setTimeout(function () { if (notif.parentNode) notif.remove(); }, 300);
+        }
+      }, 5000);
+
+      // Tambahkan style animasi jika belum ada
+      if (!document.getElementById('notifAnimStyle')) {
+        var st = document.createElement('style');
+        st.id = 'notifAnimStyle';
+        st.textContent = [
+          '@keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}',
+          '@keyframes slideOutRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}'
+        ].join('');
+        document.head.appendChild(st);
+      }
+    }
+
+
+    function testEmail() {
+      var countPajak = (S.admin.emailsPajak || []).length;
+      var countSewa = (S.admin.emailsSewa || []).length;
+      var countGen = (S.admin.emails || []).length;
+      if (!countPajak && !countSewa && !countGen) { toast('Tambahkan minimal satu email penerima dulu', 'warn'); return }
+      var btn = document.getElementById('btnTest');
+      btn.innerHTML = '<span class="spin" style="border-top-color:var(--bg-0)"></span> Mengirim…'; btn.disabled = true;
+
+      callGasApi('sendTestReminderEmail', S.admin, function (r) {
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Email Tes Sekarang'; btn.disabled = false;
+        r && r.success ? toast('Email tes berhasil dikirim!') : toast((r && r.message) || 'Gagal mengirim email', 'err');
+      }, function (e) {
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Email Tes Sekarang'; btn.disabled = false;
+        toast('Error: ' + (e.message || e), 'err');
+      });
+    }
+
+    /* ─── EXPORT ────────────────────────────── */
+    function exportData(type) {
+      var data = type === 'pajak' ? S.pajak : S.sewa;
+      if (!data.length) { toast('Tidak ada data untuk diekspor', 'warn'); return }
+      var h, r;
+      if (type === 'pajak') {
+        h = ['Nama Unit', 'No. Polisi', 'Atas Nama', 'Warna', 'Tgl Bayar Pajak', 'Nominal Pajak', 'Jatuh Tempo Pajak', 'Tgl Bayar STNK', 'Nominal STNK', 'Jatuh Tempo STNK', 'Keterangan'];
+        r = data.map(function (d) { return [d.namaUnit, d.nopol, d.atasNama, d.warna, d.tglBayar, d.nominal, d.jatuhTempo, d.tglStnk, d.nominalStnk, d.jatuhTempoStnk, d.keterangan] });
+      } else {
+        h = ['Nama Rumah', 'Nama Penyewa', 'Nama Pemilik', 'Keterangan Sewa', 'Biaya Sewa', 'Tgl Mulai', 'Tgl Berakhir', 'Link MOU', 'Link Kondisi Awal', 'Catatan'];
+        r = data.map(function (d) { return [d.namaRumah, d.namaPenyewa, d.namaPemilik, d.keterangan, d.biaya, d.tglMulai, d.tglBerakhir, d.linkMou, d.linkKondisi, d.catatan] });
+      }
+      var csv = [h].concat(r).map(function (row) { return row.map(function (c) { return '"' + (c || '').toString().replace(/"/g, '""') + '"' }).join(',') }).join('\n');
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
+      a.download = 'rekap_' + type + '_' + new Date().toISOString().split('T')[0] + '.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      toast('Data diekspor sebagai CSV!');
+    }
+
+    /* ─── DATABASE BRIDGE (SUPABASE & GAS BACKUP) ────────────────── */
+    var SUPABASE_URL = 'https://epyhjapavslexaifbtkh.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_X7BRtx9UA2n_cUpTjK2Fbg_ax1_FTXA';
+    var DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzHS5ekgKDtmo_mnF032527Q9ZC3h6A6MIkZJPEuDrrpVn3hTgwgIpLJmSWVAGh0q7C/exec';
+
+    function sbHeaders() {
+      return {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      };
+    }
+
+    function mapPajakFromDb(r) {
+      return {
+        id: r.id,
+        namaUnit: r.nama_unit || '',
+        nopol: r.nopol || '',
+        atasNama: r.atas_nama || '',
+        warna: r.warna || '',
+        tglBayar: r.tgl_bayar || '',
+        nominal: Number(r.nominal) || 0,
+        jatuhTempo: r.jatuh_tempo || '',
+        tglStnk: r.tgl_stnk || '',
+        nominalStnk: Number(r.nominal_stnk) || 0,
+        jatuhTempoStnk: r.jatuh_tempo_stnk || '',
+        keterangan: r.keterangan || '',
+        createdAt: r.created_at || '',
+        updatedAt: r.updated_at || ''
+      };
+    }
+
+    function mapPajakToDb(d) {
+      return {
+        id: d.id,
+        nama_unit: d.namaUnit || '',
+        nopol: d.nopol || '',
+        atas_nama: d.atasNama || '',
+        warna: d.warna || '',
+        tgl_bayar: d.tglBayar || '',
+        nominal: Number(d.nominal) || 0,
+        jatuh_tempo: d.jatuhTempo || '',
+        tgl_stnk: d.tglStnk || '',
+        nominal_stnk: Number(d.nominalStnk) || 0,
+        jatuh_tempo_stnk: d.jatuhTempoStnk || '',
+        keterangan: d.keterangan || '',
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function mapSewaFromDb(r) {
+      return {
+        id: r.id,
+        namaRumah: r.nama_rumah || '',
+        namaPenyewa: r.nama_penyewa || '',
+        namaPemilik: r.nama_pemilik || '',
+        keterangan: r.keterangan || '',
+        biaya: Number(r.biaya) || 0,
+        tglMulai: r.tgl_mulai || '',
+        tglBerakhir: r.tgl_berakhir || '',
+        linkMou: r.link_mou || '',
+        linkKondisi: r.link_kondisi || '',
+        catatan: r.catatan || '',
+        createdAt: r.created_at || '',
+        updatedAt: r.updated_at || ''
+      };
+    }
+
+    function mapSewaToDb(d) {
+      return {
+        id: d.id,
+        nama_rumah: d.namaRumah || '',
+        nama_penyewa: d.namaPenyewa || '',
+        namaPemilik: d.namaPemilik || '',
+        keterangan: d.keterangan || '',
+        biaya: Number(d.biaya) || 0,
+        tgl_mulai: d.tglMulai || '',
+        tgl_berakhir: d.tglBerakhir || '',
+        link_mou: d.linkMou || '',
+        link_kondisi: d.linkKondisi || '',
+        catatan: d.catatan || '',
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function callGasApi(action, payload, onSuccess, onError) {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        if (action === 'saveAdminSettings') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).saveAdminSettings(payload);
+        else if (action === 'sendTestReminderEmail') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).sendTestReminderEmail(payload);
+        else if (action === 'getAllData') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).getAllData();
+        else if (action === 'saveRecord') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).saveRecord(payload.type, JSON.stringify(payload.data));
+        else if (action === 'deleteRecord') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).deleteRecord(payload.type, payload.id);
+        else if (action === 'uploadFile') google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onError).uploadFileToDrive(payload);
+        return;
+      }
+
+      // ── SUPABASE DIRECT CONNECTION ──
+      if (action === 'getAllData') {
+        Promise.all([
+          fetch(SUPABASE_URL + '/rest/v1/pajak?select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); }),
+          fetch(SUPABASE_URL + '/rest/v1/sewa?select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); }),
+          fetch(SUPABASE_URL + '/rest/v1/admin_settings?key=eq.config&select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); })
+        ])
+        .then(function(results) {
+          var rawPajak = Array.isArray(results[0]) ? results[0] : [];
+          var rawSewa = Array.isArray(results[1]) ? results[1] : [];
+          var rawAdmin = (Array.isArray(results[2]) && results[2][0] && results[2][0].value) || null;
+          var outPajak = rawPajak.map(mapPajakFromDb);
+          var outSewa = rawSewa.map(mapSewaFromDb);
+          if (onSuccess) onSuccess({ success: true, pajak: outPajak, sewa: outSewa, admin: rawAdmin });
+        })
+        .catch(function(err) {
+          // Fallback ke Google Apps Script jika Supabase terhalang koneksi
+          fetch(DEFAULT_GAS_URL + '?action=getAllData&_ts=' + Date.now())
+            .then(function(res) { return res.json(); })
+            .then(function(res) { if (onSuccess) onSuccess(res); })
+            .catch(function(gasErr) { if (onError) onError(err || gasErr); });
+        });
+        return;
+      }
+
+      if (action === 'saveRecord') {
+        var tbl = payload.type === 'pajak' ? 'pajak' : 'sewa';
+        var record = payload.type === 'pajak' ? mapPajakToDb(payload.data) : mapSewaToDb(payload.data);
+        fetch(SUPABASE_URL + '/rest/v1/' + tbl, {
+          method: 'POST',
+          headers: sbHeaders(),
+          body: JSON.stringify(record)
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Supabase error: HTTP ' + res.status);
+          if (onSuccess) onSuccess({ success: true });
+        })
+        .catch(function(err) {
+          // Fallback ke Google Apps Script
+          var body = { action: 'saveRecord', type: payload.type, data: payload.data };
+          fetch(DEFAULT_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(body)
+          })
+          .then(function(res) { return res.json(); })
+          .then(function(res) { if (onSuccess) onSuccess(res); })
+          .catch(function(gasErr) { if (onError) onError(err || gasErr); });
+        });
+        return;
+      }
+
+      if (action === 'deleteRecord') {
+        var tblDel = payload.type === 'pajak' ? 'pajak' : 'sewa';
+        fetch(SUPABASE_URL + '/rest/v1/' + tblDel + '?id=eq.' + encodeURIComponent(payload.id), {
+          method: 'DELETE',
+          headers: sbHeaders()
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Supabase error: HTTP ' + res.status);
+          if (onSuccess) onSuccess({ success: true });
+        })
+        .catch(function(err) {
+          // Fallback ke Google Apps Script
+          var bodyDelete = { action: 'deleteRecord', type: payload.type, id: payload.id };
+          fetch(DEFAULT_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(bodyDelete)
+          })
+          .then(function(res) { return res.json(); })
+          .then(function(res) { if (onSuccess) onSuccess(res); })
+          .catch(function(gasErr) { if (onError) onError(err || gasErr); });
+        });
+        return;
+      }
+
+      if (action === 'saveAdminSettings') {
+        var adminPayload = { key: 'config', value: payload, updated_at: new Date().toISOString() };
+        fetch(SUPABASE_URL + '/rest/v1/admin_settings', {
+          method: 'POST',
+          headers: sbHeaders(),
+          body: JSON.stringify(adminPayload)
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Supabase error: HTTP ' + res.status);
+          if (onSuccess) onSuccess({ success: true });
+        })
+        .catch(function(err) {
+          if (onError) onError(err);
+        });
+        return;
+      }
+
+      // Default fallback untuk action lain (misal sendTestReminderEmail)
+      var bodyOther = { action: action, data: payload };
+      fetch(DEFAULT_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(bodyOther)
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(res) { if (onSuccess) onSuccess(res); })
+      .catch(function(err) { if (onError) onError(err); });
+    }
+
+    function handleFileUpload(inputEl, targetInputId, statusElId) {
+      var file = inputEl.files[0];
+      if (!file) return;
+
+      var statusEl = document.getElementById(statusElId);
+      var targetInput = document.getElementById(targetInputId);
+
+      if (file.size > 15 * 1024 * 1024) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:#e05555">❌ Ukuran file maksimal 15MB!</span>';
+        toast('File terlalu besar (Maks 15MB)', 'error');
+        inputEl.value = '';
+        return;
+      }
+
+      if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah file ke Google Drive...';
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var base64Data = e.target.result;
+        var payload = {
+          base64: base64Data,
+          fileName: file.name,
+          mimeType: file.type
+        };
+
+        callGasApi('uploadFile', payload, function (res) {
+          if (res && res.success && res.url) {
+            targetInput.value = res.url;
+            if (statusEl) statusEl.innerHTML = '<span style="color:#7ecf65">✓ Berhasil di-upload ke Google Drive!</span>';
+            toast('File berhasil di-upload ke Google Drive!');
+          } else {
+            var errMs = (res && res.message) ? res.message : 'Gagal mengunggah file';
+            if (statusEl) statusEl.innerHTML = '<span style="color:#e05555">❌ ' + esc(errMs) + '</span>';
+            toast(errMs, 'error');
+          }
+          inputEl.value = '';
+        }, function (err) {
+          if (statusEl) statusEl.innerHTML = '<span style="color:#e05555">❌ Gagal koneksi upload</span>';
+          toast('Gagal mengunggah file', 'error');
+          inputEl.value = '';
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* ─── SHEET BRIDGE ───────────────────────────────────────────────────────── */
+    function saveToSheet(t, d, onDone) {
+      saveLocalCache();
+      callGasApi('saveRecord', { type: t, data: d }, function (r) {
+        if (r && r.success) { /* cache dibiarkan */ }
+        else toast('⚠️ Gagal sinkron ke Sheet: ' + ((r && r.message) || 'Cek URL GAS'), 'warn');
+        if (onDone) onDone(r);
+      }, function (e) {
+        toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
+        if (onDone) onDone(null);
+      });
+    }
+    function delFromSheet(t, id) {
+      saveLocalCache();
+      callGasApi('deleteRecord', { type: t, id: id }, function (r) {
+        if (r && r.success) clearLocalCache();
+        else toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet', 'warn');
+      }, function (e) {
+        toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+
+    /* ─── SYNC LOCAL → SHEET ────────────────────────────────────────────────── */
+    function showSyncBtn(show) {
+      var btn = document.getElementById('btnSync');
+      if (btn) btn.style.display = show ? 'inline-flex' : 'none';
+    }
+
+    function syncLocalToSheet() {
+      var records = S.pajak.filter(function (d) { return d.id; }).concat(
+        S.sewa.filter(function (d) { return d.id; }));
+      if (!records.length) { showSyncBtn(false); return; }
+
+      var btn = document.getElementById('btnSync');
+      if (btn) { btn.classList.add('syncing'); btn.disabled = true; }
+      toast('🔄 Menyinkronkan ' + records.length + ' data ke Google Sheet…', 'warn');
+
+      var done = 0;
+      var success = 0;
+      function onDone(r) {
+        done++;
+        if (r && r.success) success++;
+        if (done === records.length) {
+          if (btn) { btn.classList.remove('syncing'); btn.disabled = false; }
+          if (success > 0) {
+            clearLocalCache();
+            showSyncBtn(false);
+            toast('✅ ' + success + ' data berhasil disimpan ke Sheet!');
+            setTimeout(function () { loadAll(); }, 1200);
+          } else {
+            toast('⚠️ Sinkronisasi gagal. Periksa koneksi & URL GAS.', 'warn');
+          }
+        }
+      }
+      S.pajak.forEach(function (d) { if (d.id) saveToSheet('pajak', d, onDone); });
+      S.sewa.forEach(function (d) { if (d.id) saveToSheet('sewa', d, onDone); });
+    }
+
+    /* ─── LOAD ALL DATA (dari Sheet, dengan cache fallback) ──────────────────── */
+    function loadAll() {
+      var hasCachedData = loadLocalCache();
+      if (hasCachedData) {
+        populateAdminForm(); renderPajak(); renderSewa(); badges();
+      } else {
+        document.getElementById('list-pajak').innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">⏳</div><div class="empty-title">Memuat data…</div><div class="empty-desc">Mohon tunggu sebentar</div></div>';
+        document.getElementById('list-sewa').innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">⏳</div><div class="empty-title">Memuat data…</div><div class="empty-desc">Mohon tunggu sebentar</div></div>';
+      }
+
+      callGasApi('getAllData', null, function (r) {
+        if (!r || !r.success) {
+          if (!hasCachedData) toast('⚠️ Gagal memuat data database.', 'warn');
+          else toast('⚠️ Menampilkan data cache lokal.', 'warn');
+          return;
+        }
+
+        var sheetPajak = r.pajak || [];
+        var sheetSewa = r.sewa || [];
+
+        if (sheetPajak.length > 0 || sheetSewa.length > 0 || !hasCachedData) {
+          S.pajak = sheetPajak;
+          S.sewa = sheetSewa;
+          if (r.admin) { Object.assign(S.admin, r.admin); populateAdminForm(); }
+          saveLocalCache();
+          renderPajak(); renderSewa(); badges();
+        } else if (hasCachedData && (S.pajak.length > 0 || S.sewa.length > 0)) {
+          toast('🔄 Menyimpan data lokal ke database…', 'warn');
+          syncLocalToSheet();
+        }
+      }, function (e) {
+        if (!hasCachedData) {
+          toast('⚠️ Gagal sinkronisasi data.', 'warn');
+        }
+        renderPajak(); renderSewa(); badges();
+      });
+    }
+
+    /* ─── INIT ──────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+      renderEmails(); renderPajak(); renderSewa(); badges(); loadAll();
+    });
+  </script>
+</body>
+
+</html>

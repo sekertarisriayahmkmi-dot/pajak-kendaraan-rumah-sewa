@@ -1,0 +1,5 @@
+# Local environment & IDE
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
