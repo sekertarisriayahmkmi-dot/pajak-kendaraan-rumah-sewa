@@ -1778,9 +1778,17 @@
                 <button onclick="filterPajakByStat('')" style="background:none;border:none;color:inherit;cursor:pointer;font-size:12px;padding:0 2px" title="Reset Filter">&times;</button>
               </span>
             </div>
-            <button class="btn btn-ghost" onclick="exportData('pajak')" style="font-size:12px;padding:8px 16px">
-              <i class="fa-solid fa-arrow-down-to-bracket"></i> Export CSV
-            </button>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-gold" onclick="printReport('pajak')" style="font-size:12px;padding:7px 14px" title="Cetak atau Simpan sebagai PDF Siap Print">
+                <i class="fa-solid fa-print"></i> Cetak / PDF
+              </button>
+              <button class="btn btn-ghost" onclick="exportExcel('pajak')" style="font-size:12px;padding:7px 14px" title="Download Excel (.xls) dengan format rapi & siap print">
+                <i class="fa-solid fa-file-excel" style="color:#22c55e"></i> Excel
+              </button>
+              <button class="btn btn-ghost" onclick="exportData('pajak')" style="font-size:12px;padding:7px 12px" title="Download file CSV">
+                <i class="fa-solid fa-file-csv"></i> CSV
+              </button>
+            </div>
           </div>
           <div class="entries" id="list-pajak">
             <div class="empty">
@@ -1873,9 +1881,17 @@
               <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-house-circle-check"></i></div>
               <span class="panel-title">Daftar Rumah Sewa</span>
             </div>
-            <button class="btn btn-ghost" onclick="exportData('sewa')" style="font-size:12px;padding:8px 16px">
-              <i class="fa-solid fa-arrow-down-to-bracket"></i> Export CSV
-            </button>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-gold" onclick="printReport('sewa')" style="font-size:12px;padding:7px 14px" title="Cetak atau Simpan sebagai PDF Siap Print">
+                <i class="fa-solid fa-print"></i> Cetak / PDF
+              </button>
+              <button class="btn btn-ghost" onclick="exportExcel('sewa')" style="font-size:12px;padding:7px 14px" title="Download Excel (.xls) dengan format rapi & siap print">
+                <i class="fa-solid fa-file-excel" style="color:#22c55e"></i> Excel
+              </button>
+              <button class="btn btn-ghost" onclick="exportData('sewa')" style="font-size:12px;padding:7px 12px" title="Download file CSV">
+                <i class="fa-solid fa-file-csv"></i> CSV
+              </button>
+            </div>
           </div>
           <div class="entries" id="list-sewa">
             <div class="empty">
@@ -3866,7 +3882,7 @@
       });
     }
 
-    /* ─── EXPORT ────────────────────────────── */
+    /* ─── EXPORT & CETAK LAPORAN ────────────────────────────── */
     function exportData(type) {
       var data = type === 'pajak' ? S.pajak : S.sewa;
       if (!data.length) { toast('Tidak ada data untuk diekspor', 'warn'); return }
@@ -3883,6 +3899,268 @@
       a.download = 'rekap_' + type + '_' + new Date().toISOString().split('T')[0] + '.csv';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       toast('Data diekspor sebagai CSV!');
+    }
+
+    function exportExcel(type) {
+      var data = type === 'pajak' ? S.pajak : S.sewa;
+      if (!data.length) { toast('Tidak ada data untuk diekspor', 'warn'); return; }
+
+      var title = type === 'pajak' ? 'Rekapitulasi Pajak Kendaraan' : 'Rekapitulasi Sewa Rumah';
+      var nowStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+        '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>' + title + '</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        '<style>' +
+        'body { font-family: Calibri, Arial, sans-serif; }' +
+        'table { border-collapse: collapse; width: 100%; }' +
+        'th { background-color: #1e293b; color: #ffffff; font-weight: bold; border: 1px solid #475569; padding: 10px 8px; text-align: center; }' +
+        'td { border: 1px solid #cbd5e1; padding: 7px 8px; font-size: 11pt; }' +
+        '.num { text-align: right; mso-number-format: "\\Rp\\ #\\,##0"; }' +
+        '.center { text-align: center; }' +
+        '.bold { font-weight: bold; }' +
+        '.expired { color: #dc2626; font-weight: bold; }' +
+        '.segera { color: #d97706; font-weight: bold; }' +
+        '.aktif { color: #16a34a; font-weight: bold; }' +
+        '.dupe { background-color: #fee2e2; color: #991b1b; font-weight: bold; }' +
+        '</style></head><body>' +
+        '<h2>DIVISI RIAYAH – PONDOK MUNZALAN MUBAROKAN</h2>' +
+        '<h3>' + title.toUpperCase() + '</h3>' +
+        '<p>Tanggal Cetak: ' + nowStr + ' | Total: ' + data.length + ' Data</p>' +
+        '<table>';
+
+      if (type === 'pajak') {
+        var nopolCounts = getDuplicateNopols();
+        var totNomPajak = 0;
+        var totNomStnk = 0;
+        var totTunggakan = 0;
+
+        html += '<thead><tr>' +
+          '<th>No</th><th>Nama Unit Kendaraan</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Warna</th>' +
+          '<th>Tgl Bayar Pajak</th><th>Nominal Pajak/Thn</th><th>Jatuh Tempo Pajak</th>' +
+          '<th>Tgl Bayar STNK</th><th>Nominal STNK</th><th>Jatuh Tempo STNK</th>' +
+          '<th>Estimasi Tunggakan</th><th>Status</th><th>Keterangan</th>' +
+          '</tr></thead><tbody>';
+
+        data.forEach(function (d, idx) {
+          var st = sts(daysTo(d.jatuhTempo));
+          var tunggakan = hitungTunggakanPajak(d);
+          var isDupe = (nopolCounts[normalizeNopol(d.nopol)] || 0) > 1;
+          totNomPajak += (parseInt(d.nominal) || 0);
+          totNomStnk += (parseInt(d.nominalStnk) || 0);
+          totTunggakan += tunggakan;
+
+          html += '<tr>' +
+            '<td class="center">' + (idx + 1) + '</td>' +
+            '<td>' + (d.namaUnit || '-') + '</td>' +
+            '<td class="center bold ' + (isDupe ? 'dupe' : '') + '">' + (d.nopol || '-') + (isDupe ? ' (Duplikat)' : '') + '</td>' +
+            '<td>' + (d.atasNama || '-') + '</td>' +
+            '<td class="center">' + (d.warna || '-') + '</td>' +
+            '<td class="center">' + (d.tglBayar ? fdate(d.tglBayar) : '-') + '</td>' +
+            '<td class="num">' + (parseInt(d.nominal) || 0) + '</td>' +
+            '<td class="center">' + (d.jatuhTempo ? fdate(d.jatuhTempo) : '-') + '</td>' +
+            '<td class="center">' + (d.tglStnk ? fdate(d.tglStnk) : '-') + '</td>' +
+            '<td class="num">' + (parseInt(d.nominalStnk) || 0) + '</td>' +
+            '<td class="center">' + (d.jatuhTempoStnk ? fdate(d.jatuhTempoStnk) : '-') + '</td>' +
+            '<td class="num ' + (tunggakan > 0 ? 'expired' : '') + '">' + tunggakan + '</td>' +
+            '<td class="center ' + st.cls + '">' + st.label + '</td>' +
+            '<td>' + (d.keterangan || '-') + '</td>' +
+            '</tr>';
+        });
+
+        // Baris Total
+        html += '<tr style="background:#f1f5f9;font-weight:bold">' +
+          '<td colspan="6" class="center">TOTAL KESELURUHAN</td>' +
+          '<td class="num bold">' + totNomPajak + '</td>' +
+          '<td></td><td></td>' +
+          '<td class="num bold">' + totNomStnk + '</td>' +
+          '<td></td>' +
+          '<td class="num bold expired">' + totTunggakan + '</td>' +
+          '<td colspan="2"></td>' +
+          '</tr>';
+      } else {
+        var totBiaya = 0;
+        html += '<thead><tr>' +
+          '<th>No</th><th>Nama / Alamat Rumah</th><th>Nama Penyewa</th><th>Nama Pemilik</th>' +
+          '<th>Keterangan Kontrak</th><th>Biaya Sewa</th><th>Tgl Mulai</th><th>Tgl Berakhir</th>' +
+          '<th>Status</th><th>Catatan</th>' +
+          '</tr></thead><tbody>';
+
+        data.forEach(function (d, idx) {
+          var st = sts(daysTo(d.tglBerakhir));
+          totBiaya += (parseInt(d.biaya) || 0);
+
+          html += '<tr>' +
+            '<td class="center">' + (idx + 1) + '</td>' +
+            '<td>' + (d.namaRumah || '-') + '</td>' +
+            '<td>' + (d.namaPenyewa || '-') + '</td>' +
+            '<td>' + (d.namaPemilik || '-') + '</td>' +
+            '<td>' + (d.keterangan || '-') + '</td>' +
+            '<td class="num">' + (parseInt(d.biaya) || 0) + '</td>' +
+            '<td class="center">' + (d.tglMulai ? fdate(d.tglMulai) : '-') + '</td>' +
+            '<td class="center">' + (d.tglBerakhir ? fdate(d.tglBerakhir) : '-') + '</td>' +
+            '<td class="center ' + st.cls + '">' + st.label + '</td>' +
+            '<td>' + (d.catatan || '-') + '</td>' +
+            '</tr>';
+        });
+
+        html += '<tr style="background:#f1f5f9;font-weight:bold">' +
+          '<td colspan="5" class="center">TOTAL BIAYA SEWA</td>' +
+          '<td class="num bold">' + totBiaya + '</td>' +
+          '<td colspan="4"></td>' +
+          '</tr>';
+      }
+
+      html += '</tbody></table></body></html>';
+
+      var blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Laporan_' + (type === 'pajak' ? 'Pajak_Kendaraan' : 'Sewa_Rumah') + '_' + new Date().toISOString().split('T')[0] + '.xls';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast('Laporan Excel (.xls) berhasil diunduh!');
+    }
+
+    function printReport(type) {
+      var data = type === 'pajak' ? S.pajak : S.sewa;
+      if (!data.length) { toast('Tidak ada data untuk dicetak', 'warn'); return; }
+
+      var printWin = window.open('', '_blank');
+      if (!printWin) {
+        toast('Popup diblokir oleh browser. Izinkan popup untuk mencetak.', 'err');
+        return;
+      }
+
+      var nowStr = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+      });
+      var isPajak = type === 'pajak';
+      var title = isPajak ? 'REKAPITULASI PEMBAYARAN PAJAK KENDARAAN' : 'REKAPITULASI SEWA RUMAH & PROPERTI';
+
+      // Ringkasan Header
+      var summaryHtml = '';
+      if (isPajak) {
+        var totNom = data.reduce(function(a, d) { return a + (parseInt(d.nominal) || 0); }, 0);
+        var totTunggakan = data.reduce(function(a, d) { return a + hitungTunggakanPajak(d); }, 0);
+        var segeraCount = data.filter(function(d) { var dd = daysTo(d.jatuhTempo); return dd >= 0 && dd <= 30; }).length;
+        var expCount = data.filter(function(d) { return daysTo(d.jatuhTempo) < 0; }).length;
+
+        summaryHtml = '<div class="summary-box">' +
+          '<div class="sum-item"><div class="sum-title">Total Unit</div><div class="sum-val">' + data.length + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Jatuh Tempo (≤30 Hr)</div><div class="sum-val" style="color:#b45309">' + segeraCount + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Pajak Expired</div><div class="sum-val" style="color:#b91c1c">' + expCount + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Total Nominal Pajak/Thn</div><div class="sum-val">' + cur(totNom) + '</div></div>' +
+          (totTunggakan > 0 ? '<div class="sum-item"><div class="sum-title">Estimasi Tunggakan</div><div class="sum-val" style="color:#b91c1c">' + cur(totTunggakan) + '</div></div>' : '') +
+          '</div>';
+      } else {
+        var totBiaya = data.reduce(function(a, d) { return a + (parseInt(d.biaya) || 0); }, 0);
+        var segeraSewa = data.filter(function(d) { var dd = daysTo(d.tglBerakhir); return dd >= 0 && dd <= 30; }).length;
+        var expSewa = data.filter(function(d) { return daysTo(d.tglBerakhir) < 0; }).length;
+
+        summaryHtml = '<div class="summary-box">' +
+          '<div class="sum-item"><div class="sum-title">Total Unit Sewa</div><div class="sum-val">' + data.length + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Hampir Berakhir</div><div class="sum-val" style="color:#b45309">' + segeraSewa + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Kontrak Lewat</div><div class="sum-val" style="color:#b91c1c">' + expSewa + ' Unit</div></div>' +
+          '<div class="sum-item"><div class="sum-title">Total Biaya Sewa</div><div class="sum-val">' + cur(totBiaya) + '</div></div>' +
+          '</div>';
+      }
+
+      // Baris Tabel
+      var rowsHtml = '';
+      if (isPajak) {
+        var nopolCounts = getDuplicateNopols();
+        rowsHtml = data.map(function (d, i) {
+          var st = sts(daysTo(d.jatuhTempo));
+          var tunggakan = hitungTunggakanPajak(d);
+          var isDupe = (nopolCounts[normalizeNopol(d.nopol)] || 0) > 1;
+          var badgeColor = st.cls === 'expired' ? '#fecaca;color:#991b1b;border:1px solid #f87171' :
+                           (st.cls === 'segera' ? '#fef3c7;color:#92400e;border:1px solid #fbbf24' : '#dcfce7;color:#166534;border:1px solid #86efac');
+          return '<tr>' +
+            '<td style="text-align:center">' + (i + 1) + '</td>' +
+            '<td><strong>' + esc(d.namaUnit) + '</strong>' + (d.warna ? '<br><small style="color:#64748b">Warna: ' + esc(d.warna) + '</small>' : '') + '</td>' +
+            '<td style="text-align:center;font-weight:700">' + esc(d.nopol) + (isDupe ? ' <span style="font-size:9px;background:#fee2e2;color:#991b1b;padding:1px 5px;border-radius:4px">Duplikat</span>' : '') + '</td>' +
+            '<td>' + esc(d.atasNama) + '</td>' +
+            '<td style="text-align:center">' + (d.jatuhTempo ? fdate(d.jatuhTempo) : '-') + '</td>' +
+            '<td style="text-align:right;font-weight:600">' + cur(d.nominal) + '</td>' +
+            '<td style="text-align:center">' + (d.jatuhTempoStnk ? fdate(d.jatuhTempoStnk) : '-') + '</td>' +
+            '<td style="text-align:right">' + cur(d.nominalStnk) + '</td>' +
+            '<td style="text-align:center"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + badgeColor + '">' + st.label + '</span></td>' +
+            '<td style="text-align:right;color:' + (tunggakan > 0 ? '#b91c1c;font-weight:bold' : '#64748b') + '">' + (tunggakan > 0 ? cur(tunggakan) : '-') + '</td>' +
+            '</tr>';
+        }).join('');
+      } else {
+        rowsHtml = data.map(function (d, i) {
+          var st = sts(daysTo(d.tglBerakhir));
+          var badgeColor = st.cls === 'expired' ? '#fecaca;color:#991b1b;border:1px solid #f87171' :
+                           (st.cls === 'segera' ? '#fef3c7;color:#92400e;border:1px solid #fbbf24' : '#dcfce7;color:#166534;border:1px solid #86efac');
+          return '<tr>' +
+            '<td style="text-align:center">' + (i + 1) + '</td>' +
+            '<td><strong>' + esc(d.namaRumah) + '</strong></td>' +
+            '<td>' + esc(d.namaPenyewa) + '</td>' +
+            '<td>' + esc(d.namaPemilik) + '</td>' +
+            '<td>' + esc(d.keterangan) + '</td>' +
+            '<td style="text-align:center">' + (d.tglMulai ? fdate(d.tglMulai) : '-') + '</td>' +
+            '<td style="text-align:center">' + (d.tglBerakhir ? fdate(d.tglBerakhir) : '-') + '</td>' +
+            '<td style="text-align:right;font-weight:700">' + cur(d.biaya) + '</td>' +
+            '<td style="text-align:center"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + badgeColor + '">' + st.label + '</span></td>' +
+            '</tr>';
+        }).join('');
+      }
+
+      var theadHtml = isPajak ?
+        '<tr><th>No</th><th>Nama Unit Kendaraan</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Tempo Pajak</th><th>Nominal Pajak</th><th>Tempo STNK</th><th>Nominal STNK</th><th>Status</th><th>Estimasi Tunggakan</th></tr>' :
+        '<tr><th>No</th><th>Nama / Alamat Rumah</th><th>Nama Penyewa</th><th>Pemilik Rumah</th><th>Keterangan</th><th>Tgl Mulai</th><th>Tgl Berakhir</th><th>Biaya Sewa</th><th>Status</th></tr>';
+
+      var docContent = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+        '<title>' + title + ' – Riayah Center</title>' +
+        '<style>' +
+        '@page { size: landscape; margin: 10mm; }' +
+        'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #0f172a; margin: 0; padding: 15px; font-size: 11px; background: #ffffff; }' +
+        '.kop-header { text-align: center; border-bottom: 2.5px solid #0f172a; padding-bottom: 12px; margin-bottom: 14px; }' +
+        '.kop-title { font-size: 17px; font-weight: 800; letter-spacing: 0.5px; color: #0f172a; margin: 0 0 3px 0; }' +
+        '.kop-sub { font-size: 13px; font-weight: 700; color: #334155; margin: 0 0 4px 0; }' +
+        '.kop-date { font-size: 10.5px; color: #64748b; margin: 0; }' +
+        '.summary-box { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }' +
+        '.sum-item { flex: 1; min-width: 120px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; text-align: center; }' +
+        '.sum-title { font-size: 9.5px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 3px; }' +
+        '.sum-val { font-size: 13.5px; font-weight: 800; color: #0f172a; }' +
+        'table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10.5px; }' +
+        'th { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; padding: 7px 6px; font-weight: 700; font-size: 10px; text-align: center; text-transform: uppercase; }' +
+        'td { border: 1px solid #e2e8f0; padding: 6px 7px; vertical-align: middle; }' +
+        'tr:nth-child(even) { background-color: #fafaf9; }' +
+        '.sign-wrap { margin-top: 30px; display: flex; justify-content: flex-end; page-break-inside: avoid; }' +
+        '.sign-box { text-align: center; width: 220px; }' +
+        '.sign-line { margin-top: 60px; border-bottom: 1px solid #0f172a; font-weight: 700; padding-bottom: 2px; }' +
+        '@media print { .no-print { display: none !important; } body { padding: 0; } }' +
+        '</style></head><body>' +
+        '<div class="no-print" style="margin-bottom:15px;background:#e0f2fe;border:1px solid #7dd3fc;padding:10px 16px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">' +
+        '<div><strong>Pratinjau Siap Cetak (Landscape A4)</strong> – Format resmi siap disimpan sebagai PDF atau dicetak langsung.</div>' +
+        '<div><button onclick="window.print()" style="background:#0284c7;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-weight:700;cursor:pointer">🖨️ Cetak / Simpan PDF</button></div>' +
+        '</div>' +
+        '<div class="kop-header">' +
+        '<div class="kop-title">DIVISI RIAYAH – PONDOK MUNZALAN MUBAROKAN</div>' +
+        '<div class="kop-sub">' + title + '</div>' +
+        '<div class="kop-date">Dokumen Rekapitulasi Resmi · Dicetak pada: ' + nowStr + '</div>' +
+        '</div>' +
+        summaryHtml +
+        '<table><thead>' + theadHtml + '</thead><tbody>' + rowsHtml + '</tbody></table>' +
+        '<div class="sign-wrap">' +
+        '<div class="sign-box">' +
+        '<div>Pontianak, ' + new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + '</div>' +
+        '<div style="margin-top:4px">Penanggung Jawab Divisi Riayah,</div>' +
+        '<div class="sign-line">Pengurus / Admin Riayah</div>' +
+        '</div></div>' +
+        '</body></html>';
+
+      printWin.document.open();
+      printWin.document.write(docContent);
+      printWin.document.close();
+
+      setTimeout(function () {
+        printWin.focus();
+        printWin.print();
+      }, 500);
     }
 
     /* ─── DATABASE BRIDGE (SUPABASE & GAS BACKUP) ────────────────── */
