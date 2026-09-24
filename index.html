@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -536,6 +536,41 @@
       50% {
         box-shadow: 0 0 0 5px rgba(212, 146, 74, 0.18);
       }
+    }
+
+    @keyframes entryPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7);
+        border-color: var(--gold);
+        transform: scale(1.005);
+      }
+      50% {
+        box-shadow: 0 0 24px 6px rgba(201, 168, 76, 0.45);
+        border-color: var(--gold-light);
+        transform: scale(1.015);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(201, 168, 76, 0);
+        border-color: var(--border);
+        transform: scale(1);
+      }
+    }
+    .entry-highlight-pulse {
+      animation: entryPulse 2s ease-out;
+      border-color: var(--gold) !important;
+    }
+    .dash-cat-stat-item {
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 4px 6px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .dash-cat-stat-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+    .dash-urgent-row:hover {
+      background: rgba(255, 255, 255, 0.035);
     }
 
     @keyframes spin {
@@ -1662,10 +1697,424 @@
         border-radius: var(--radius-xl)
       }
     }
+
+    /* ==============================================================
+       CINEMATIC INTRO SPLASH SCREEN (TRUE FULLSCREEN)
+       ============================================================== */
+    .cinematic-splash {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99999;
+      background: #000000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .cinematic-splash.fade-out {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.03);
+    }
+
+    /* Fullscreen Background Video */
+    .splash-video-fullscreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      background: #000000;
+      pointer-events: none; /* Mencegah browser memunculkan overlay PiP / media bawaan */
+    }
+
+    /* Sembunyikan kontrol bawaan browser dan tombol Picture-in-Picture */
+    .splash-video-fullscreen::-webkit-media-controls,
+    .splash-video-fullscreen::-webkit-media-controls-enclosure,
+    .splash-video-fullscreen::-webkit-media-controls-panel {
+      display: none !important;
+      -webkit-appearance: none !important;
+      opacity: 0 !important;
+    }
+
+    /* Sleek Floating Skip Button (Hanya tombol Lewati) */
+    .splash-skip-only-btn {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: rgba(14, 32, 24, 0.72);
+      color: #ffffff;
+      border: 1px solid var(--gold, #cfa86e);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 168, 76, 0.2);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .splash-skip-only-btn:hover {
+      background: rgba(201, 168, 76, 0.35);
+      border-color: #ffd992;
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 22px rgba(201, 168, 76, 0.4);
+    }
+
+    .splash-skip-only-btn svg {
+      transition: transform 0.2s;
+    }
+
+    .splash-skip-only-btn:hover svg {
+      transform: translateX(2px);
+    }
+
+    /* Fallback play prompt if browser blocks autoplay entirely */
+    .splash-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      border: none;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 15;
+      backdrop-filter: blur(4px);
+    }
+
+    .splash-play-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c9a84c, #b8922e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 0 28px rgba(201, 168, 76, 0.65);
+      animation: pulseGoldSplash 2s infinite;
+    }
+
+    @keyframes pulseGoldSplash {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.7); }
+      70% { transform: scale(1.06); box-shadow: 0 0 0 16px rgba(201, 168, 76, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+    }
+
+    /* Edge-to-Edge Progress Track */
+    .splash-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      z-index: 20;
+    }
+
+    .splash-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #d4924a 0%, #c9a84c 60%, #fff4d1 100%);
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.9);
+      transition: width 0.1s linear;
+    }
+
+    @media (max-width: 600px) {
+      .splash-skip-only-btn {
+        top: 16px;
+        right: 16px;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* ================================================================
+       DASHBOARD STYLES
+    ================================================================ */
+    .dash-hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .dash-hero-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--dur) var(--ease);
+    }
+    .dash-hero-card:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+    }
+    .dash-cats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .dash-cat-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all var(--dur) var(--ease);
+    }
+    .dash-cat-card:hover {
+      border-color: rgba(201, 168, 76, 0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      transform: translateY(-2px);
+    }
+    .dash-cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-cat-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dash-cat-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--bg-3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    .dash-cat-stat-item {
+      text-align: center;
+    }
+    .dash-cat-stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-1);
+    }
+    .dash-cat-stat-lbl {
+      font-size: 10.5px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+    .dash-urgent-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .dash-urgent-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .dash-urgent-table th {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-3);
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .dash-urgent-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      vertical-align: middle;
+    }
+    .dash-urgent-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .dash-urgent-table tr:last-child td {
+      border-bottom: none;
+    }
+    .dash-cashflow-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 28px;
+    }
+    .dash-months-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 8px;
+      margin-top: 18px;
+    }
+    @media (max-width: 900px) {
+      .dash-months-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+    @media (max-width: 500px) {
+      .dash-months-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    .dash-month-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 6px;
+      text-align: center;
+      transition: all var(--dur) var(--ease);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .dash-month-card.current {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.08);
+      box-shadow: 0 0 14px rgba(201, 168, 76, 0.15);
+    }
+    .dash-month-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-2);
+    }
+    .dash-month-card.current .dash-month-name {
+      color: var(--gold);
+    }
+    .dash-month-val {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .dash-month-bar-track {
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .dash-month-bar-fill {
+      width: 16px;
+      background: linear-gradient(180deg, var(--gold-light), #b8922e);
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height 0.4s ease;
+    }
+    .dash-month-cnt {
+      font-size: 9.5px;
+      color: var(--text-3);
+    }
   </style>
 </head>
 
 <body>
+
+  <script>
+    // Early definition so buttons are IMMEDIATELY clickable even before full page load
+    function closeSplashVideo(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
+      var overlay = document.getElementById('introSplashOverlay');
+      var video = document.getElementById('splashVideo');
+      if (video) {
+        try {
+          video.pause();
+          video.src = "";
+          video.load();
+        } catch (err) {}
+      }
+      if (overlay) {
+        overlay.style.pointerEvents = 'none';
+        overlay.classList.add('fade-out');
+        overlay.style.opacity = '0';
+        overlay.style.visibility = 'hidden';
+        setTimeout(function () {
+          if (overlay && overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+          }
+        }, 300);
+      }
+    }
+    window.closeSplashVideo = closeSplashVideo;
+  </script>
+
+  <!-- ── CINEMATIC INTRO SPLASH OVERLAY (TRUE FULLSCREEN + LEWATI ONLY) ── -->
+  <div id="introSplashOverlay" class="cinematic-splash">
+    <!-- Fullscreen Video Element -->
+    <video 
+      id="splashVideo" 
+      class="splash-video-fullscreen"
+      src="intro-video.mp4" 
+      autoplay 
+      muted
+      playsinline 
+      preload="auto"
+      disablePictureInPicture
+      disableremoteplayback
+      controlsList="nodownload noplaybackrate nofullscreen noremoteplayback">
+    </video>
+
+    <!-- Hanya Tombol Lewati yang Melayang Elegan di Sudut Kanan Atas -->
+    <button type="button" id="splashSkipBtn" class="splash-skip-only-btn" title="Lewati Video" onclick="closeSplashVideo(event)">
+      <span style="pointer-events:none;">Lewati</span>
+      <svg style="pointer-events:none;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 4 15 12 5 20 5 4"></polygon>
+        <line x1="19" y1="5" x2="19" y2="19"></line>
+      </svg>
+    </button>
+
+    <!-- Fallback Play Prompt if Browser Blocks Autoplay entirely -->
+    <button type="button" id="splashManualPlayBtn" class="splash-play-overlay" style="display: none;">
+      <div class="splash-play-icon">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+        </svg>
+      </div>
+      <span>Klik untuk Memutar Video</span>
+    </button>
+
+    <!-- Edge-to-Edge Progress Track along the bottom -->
+    <div class="splash-progress-track">
+      <div id="splashProgressBar" class="splash-progress-fill"></div>
+    </div>
+  </div>
 
   <!-- ── SCENE ── -->
   <div class="scene">
@@ -1709,10 +2158,19 @@
 
     <!-- TAB BAR -->
     <nav class="tabbar">
-      <button class="tab active" id="tab-pajak" onclick="switchTab('pajak')">
-        <i class="fa-solid fa-file-invoice-dollar"></i>
-        Pajak Kendaraan
+      <button class="tab active" id="tab-dashboard" onclick="switchTab('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i>
+        Dashboard
+      </button>
+      <button class="tab" id="tab-pajak" onclick="switchTab('pajak')">
+        <i class="fa-solid fa-car-side"></i>
+        Pajak Mobil
         <span class="tab-count" id="cnt-pajak">0</span>
+      </button>
+      <button class="tab" id="tab-motor" onclick="switchTab('motor')">
+        <i class="fa-solid fa-motorcycle"></i>
+        Pajak Motor
+        <span class="tab-count" id="cnt-motor">0</span>
       </button>
       <button class="tab" id="tab-sewa" onclick="switchTab('sewa')">
         <i class="fa-solid fa-house-chimney"></i>
@@ -1729,18 +2187,266 @@
     <main class="main">
 
       <!-- ══════════════════════════════════════
-         PAGE 1 – PAJAK KENDARAAN
+         PAGE 1 – PAJAK MOBIL
     ══════════════════════════════════════ -->
-      <div class="page active" id="page-pajak">
+      <!-- ══════════════════════════════════════
+         PAGE 0 – EXECUTIVE DASHBOARD
+    ══════════════════════════════════════ -->
+      <div class="page active" id="page-dashboard">
 
         <div class="ph">
           <div class="ph-left">
-            <div class="ph-eyebrow"><i class="fa-solid fa-car-side"></i>Kendaraan</div>
-            <h1 class="ph-title">Rekap Pajak Kendaraan</h1>
-            <p class="ph-desc">Data pembayaran pajak &amp; STNK seluruh unit kendaraan divisi</p>
+            <div class="ph-eyebrow"><i class="fa-solid fa-chart-pie"></i>Executive Overview</div>
+            <h1 class="ph-title">Dashboard Terpadu Riayah</h1>
+            <p class="ph-desc">Rekapitulasi komprehensif seluruh data Pajak Mobil, Pajak Motor, dan Rumah Sewa</p>
+          </div>
+          <div class="ph-actions" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="loadAll()" title="Segarkan data dari database">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+            <button class="btn btn-gold" onclick="printExecutiveReport()">
+              <i class="fa-solid fa-print"></i> Cetak Rekap Eksekutif
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Top KPI Summary Cards -->
+        <div class="dash-hero-grid">
+          <!-- Total Semua Aset -->
+          <div class="dash-hero-card">
+            <div class="stat-icon-wrap stat-icon-gold">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="stat-num" id="dash-tot-assets">0</div>
+            <div class="stat-lbl">Total Seluruh Aset</div>
+            <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="badge" style="background:rgba(201,168,76,0.15);color:var(--gold)" id="dash-sub-mobil">0 Mobil</span>
+              <span class="badge" style="background:rgba(43,181,160,0.15);color:var(--teal)" id="dash-sub-motor">0 Motor</span>
+              <span class="badge" style="background:rgba(100,160,255,0.15);color:#70b0ff" id="dash-sub-sewa">0 Sewa</span>
+            </div>
+          </div>
+
+          <!-- Kebutuhan Kas Segera (< 30 Hari) -->
+          <div class="dash-hero-card stat-clickable" onclick="switchTabAndFilter('segera')" title="Klik untuk melihat unit yang segera jatuh tempo">
+            <div class="stat-icon-wrap stat-icon-amber">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="stat-num" id="dash-urgent-nom" style="color:var(--amber)">Rp 0</div>
+            <div class="stat-lbl">Kebutuhan Kas Segera (&le; 30 Hari)</div>
+            <div style="font-size:11.5px;color:var(--amber);margin-top:8px;font-weight:600" id="dash-urgent-cnt">
+              0 tagihan jatuh tempo
+            </div>
+          </div>
+
+          <!-- Tunggakan Expired -->
+          <div class="dash-hero-card stat-clickable" onclick="switchTabAndFilter('expired')" title="Klik untuk melihat unit expired">
+            <div class="stat-icon-wrap stat-icon-rose">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div class="stat-num" id="dash-exp-nom" style="color:var(--rose)">Rp 0</div>
+            <div class="stat-lbl">Estimasi Tunggakan Expired</div>
+            <div style="font-size:11.5px;color:var(--rose);margin-top:8px;font-weight:600" id="dash-exp-cnt">
+              0 unit telah expired
+            </div>
+          </div>
+
+          <!-- Total Anggaran Tahunan -->
+          <div class="dash-hero-card">
+            <div class="stat-icon-wrap stat-icon-teal">
+              <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-num" id="dash-annual-budget" style="color:var(--gold-light)">Rp 0</div>
+            <div class="stat-lbl">Total Komitmen Anggaran / Thn</div>
+            <div style="font-size:11.5px;color:var(--text-3);margin-top:8px">
+              Pajak Kendaraan + Sewa Rumah
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Category Snapshot Cards (Mobil, Motor, Sewa) -->
+        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+          <h2 style="font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:0.1px">
+            <i class="fa-solid fa-table-cells-large" style="color:var(--gold);margin-right:8px"></i>Komparasi Rekap Per Kategori
+          </h2>
+          <span style="font-size:12px;color:var(--text-3)">Pilih kategori untuk melihat detail data</span>
+        </div>
+
+        <div class="dash-cats-grid">
+          <!-- Card Mobil -->
+          <div class="dash-cat-card">
+            <div>
+              <div class="dash-cat-header">
+                <div class="dash-cat-title">
+                  <div class="stat-icon-wrap stat-icon-gold" style="margin-bottom:0;width:32px;height:32px;font-size:13px">
+                    <i class="fa-solid fa-car-side"></i>
+                  </div>
+                  <span>Pajak Mobil</span>
+                </div>
+                <span class="badge" style="background:rgba(201,168,76,0.18);color:var(--gold);font-weight:700" id="dash-cat-mobil-cnt">0 Unit</span>
+              </div>
+              <div style="margin-top:14px;font-size:12px;color:var(--text-3)">Total Nominal Pajak:</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-top:2px" id="dash-cat-mobil-nom">Rp 0</div>
+
+              <div class="dash-cat-stats-row" style="margin-top:14px">
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilter('aktif')" title="Lihat Mobil Aman">
+                  <div class="dash-cat-stat-val" id="dash-cat-mobil-aktif" style="color:var(--emerald)">0</div>
+                  <div class="dash-cat-stat-lbl">Aman</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilter('segera')" title="Lihat Mobil Jatuh Tempo <= 30 Hari">
+                  <div class="dash-cat-stat-val" id="dash-cat-mobil-segera" style="color:var(--amber)">0</div>
+                  <div class="dash-cat-stat-lbl">&le; 30 Hari</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilter('expired')" title="Lihat Mobil Expired">
+                  <div class="dash-cat-stat-val" id="dash-cat-mobil-exp" style="color:var(--rose)">0</div>
+                  <div class="dash-cat-stat-lbl">Expired</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="switchTab('pajak')">
+              Buka Rekap Mobil <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- Card Motor -->
+          <div class="dash-cat-card">
+            <div>
+              <div class="dash-cat-header">
+                <div class="dash-cat-title">
+                  <div class="stat-icon-wrap stat-icon-teal" style="margin-bottom:0;width:32px;height:32px;font-size:13px">
+                    <i class="fa-solid fa-motorcycle"></i>
+                  </div>
+                  <span>Pajak Motor</span>
+                </div>
+                <span class="badge" style="background:rgba(43,181,160,0.18);color:var(--teal);font-weight:700" id="dash-cat-motor-cnt">0 Unit</span>
+              </div>
+              <div style="margin-top:14px;font-size:12px;color:var(--text-3)">Total Nominal Pajak:</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-top:2px" id="dash-cat-motor-nom">Rp 0</div>
+
+              <div class="dash-cat-stats-row" style="margin-top:14px">
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterMotor('aktif')" title="Lihat Motor Aman">
+                  <div class="dash-cat-stat-val" id="dash-cat-motor-aktif" style="color:var(--emerald)">0</div>
+                  <div class="dash-cat-stat-lbl">Aman</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterMotor('segera')" title="Lihat Motor Jatuh Tempo <= 30 Hari">
+                  <div class="dash-cat-stat-val" id="dash-cat-motor-segera" style="color:var(--amber)">0</div>
+                  <div class="dash-cat-stat-lbl">&le; 30 Hari</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterMotor('expired')" title="Lihat Motor Expired">
+                  <div class="dash-cat-stat-val" id="dash-cat-motor-exp" style="color:var(--rose)">0</div>
+                  <div class="dash-cat-stat-lbl">Expired</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="switchTab('motor')">
+              Buka Rekap Motor <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- Card Sewa Rumah -->
+          <div class="dash-cat-card">
+            <div>
+              <div class="dash-cat-header">
+                <div class="dash-cat-title">
+                  <div class="stat-icon-wrap stat-icon-amber" style="margin-bottom:0;width:32px;height:32px;font-size:13px">
+                    <i class="fa-solid fa-house-chimney"></i>
+                  </div>
+                  <span>Rumah Sewa</span>
+                </div>
+                <span class="badge" style="background:rgba(212,146,74,0.18);color:var(--amber);font-weight:700" id="dash-cat-sewa-cnt">0 Unit</span>
+              </div>
+              <div style="margin-top:14px;font-size:12px;color:var(--text-3)">Total Biaya Sewa:</div>
+              <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-top:2px" id="dash-cat-sewa-nom">Rp 0</div>
+
+              <div class="dash-cat-stats-row" style="margin-top:14px">
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterSewa('aktif')" title="Lihat Sewa Aktif">
+                  <div class="dash-cat-stat-val" id="dash-cat-sewa-aktif" style="color:var(--emerald)">0</div>
+                  <div class="dash-cat-stat-lbl">Aktif</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterSewa('segera')" title="Lihat Sewa Jatuh Tempo <= 30 Hari">
+                  <div class="dash-cat-stat-val" id="dash-cat-sewa-segera" style="color:var(--amber)">0</div>
+                  <div class="dash-cat-stat-lbl">&le; 30 Hari</div>
+                </div>
+                <div class="dash-cat-stat-item" onclick="switchTabAndFilterSewa('expired')" title="Lihat Sewa Expired">
+                  <div class="dash-cat-stat-val" id="dash-cat-sewa-exp" style="color:var(--rose)">0</div>
+                  <div class="dash-cat-stat-lbl">Expired</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="switchTab('sewa')">
+              Buka Rekap Sewa <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Urgent Action Center (Prioritas Jatuh Tempo Terdekat) -->
+        <div class="dash-urgent-panel">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <div class="panel-icon stat-icon-amber" style="margin-bottom:0">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <div>
+                <div class="panel-title">Prioritas Perhatian &amp; Pembayaran Segera</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Seluruh unit dari Mobil, Motor, &amp; Sewa yang sudah expired atau jatuh tempo &le; 30 hari</div>
+              </div>
+            </div>
+            <div id="dash-urgent-badge-total" class="badge" style="background:rgba(212,146,74,0.18);color:var(--amber);font-weight:700">
+              0 Unit
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="dash-urgent-table">
+              <thead>
+                <tr>
+                  <th style="width:110px">Kategori</th>
+                  <th>Unit / Nopol / Alamat</th>
+                  <th>Pengguna / Pemilik</th>
+                  <th>Jatuh Tempo</th>
+                  <th>Sisa Waktu</th>
+                  <th style="text-align:right">Estimasi Biaya</th>
+                  <th style="text-align:center;width:90px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dash-urgent-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. Monthly Cashflow Breakdown -->
+        <div class="dash-cashflow-wrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-calendar-days" style="color:var(--gold)"></i>
+                Proyeksi Beban Kas Berdasarkan Bulan Jatuh Tempo
+              </div>
+              <div style="font-size:11.5px;color:var(--text-3);margin-top:3px">
+                Prakiraan kebutuhan dana pengeluaran pajak &amp; sewa per bulan dalam tahun berjalan
+              </div>
+            </div>
+            <span class="badge" style="background:rgba(201,168,76,0.12);color:var(--gold);border:1px solid rgba(201,168,76,0.25)">
+              Kalender Kas Tahunan
+            </span>
+          </div>
+          <div class="dash-months-grid" id="dash-months-container">
+            <!-- Dynamically populated for 12 months -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="page" id="page-pajak">
+
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-eyebrow"><i class="fa-solid fa-car-side"></i>Mobil</div>
+            <h1 class="ph-title">Rekap Pajak Mobil</h1>
+            <p class="ph-desc">Data pembayaran pajak &amp; STNK seluruh unit mobil divisi</p>
           </div>
           <button class="btn btn-gold" id="btnAddPajak" onclick="openModal('pajak')">
-            <i class="fa-solid fa-plus"></i> Tambah Kendaraan
+            <i class="fa-solid fa-plus"></i> Tambah Mobil
           </button>
         </div>
 
@@ -1848,6 +2554,125 @@
       </div>
 
       <!-- ══════════════════════════════════════
+         PAGE MOTOR – PAJAK MOTOR
+    ══════════════════════════════════════ -->
+      <div class="page" id="page-motor">
+
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-eyebrow"><i class="fa-solid fa-motorcycle"></i>Sepeda Motor</div>
+            <h1 class="ph-title">Rekap Pajak Motor</h1>
+            <p class="ph-desc">Data pembayaran pajak &amp; STNK seluruh unit sepeda motor divisi</p>
+          </div>
+          <button class="btn btn-gold" id="btnAddMotor" onclick="openModal('motor')">
+            <i class="fa-solid fa-plus"></i> Tambah Motor
+          </button>
+        </div>
+
+        <!-- Stats Motor -->
+        <div class="stats">
+          <div class="stat stat-clickable" id="card-stat-motor-total" onclick="filterMotorByStat('')" title="Klik untuk menampilkan semua sepeda motor">
+            <div class="stat-icon-wrap stat-icon-gold"><i class="fa-solid fa-motorcycle"></i></div>
+            <div class="stat-num" id="s-total-motor">0</div>
+            <div class="stat-lbl">Total Motor</div>
+          </div>
+          <div class="stat stat-clickable" id="card-stat-motor-segera" onclick="filterMotorByStat('segera')" title="Klik untuk memfilter: Jatuh Tempo ≤ 30 Hari">
+            <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-num" id="s-motor-segera" style="color:var(--amber)">0</div>
+            <div class="stat-lbl">Jatuh Tempo ≤ 30 Hari</div>
+          </div>
+          <div class="stat stat-clickable" id="card-stat-motor-tagihan" onclick="filterMotorByStat('segera')" title="Klik untuk memfilter: Tagihan Jatuh Tempo">
+            <div class="stat-icon-wrap stat-icon-amber"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="stat-num" id="s-nom-motor-segera" style="font-size:14px;padding-top:6px;color:var(--amber)">Rp 0</div>
+            <div class="stat-lbl">Tagihan Pajak (≤ 30 Hari)</div>
+          </div>
+          <div class="stat stat-clickable" id="card-stat-motor-expired" onclick="filterMotorByStat('expired')" title="Klik untuk memfilter: Pajak Expired">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="stat-num" id="s-motor-exp" style="color:var(--rose)">0</div>
+            <div class="stat-lbl">Pajak Expired</div>
+          </div>
+          <div class="stat stat-clickable" id="card-stat-motor-nominal" onclick="filterMotorByStat('')" title="Klik untuk melihat seluruh unit dan nominal">
+            <div class="stat-icon-wrap stat-icon-teal"><i class="fa-solid fa-coins"></i></div>
+            <div class="stat-num" id="s-nom-motor" style="font-size:14px;padding-top:6px">Rp 0</div>
+            <div class="stat-lbl">Total Nominal Pajak</div>
+          </div>
+          <div class="stat stat-clickable" id="stat-tunggakan-motor-wrap" style="display:none" onclick="filterMotorByStat('tunggakan')" title="Klik untuk memfilter motor yang memiliki estimasi tunggakan">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <div class="stat-num" id="s-nom-motor-tunggakan" style="font-size:13px;padding-top:6px;color:var(--rose)">Rp 0</div>
+            <div class="stat-lbl">Estimasi Tunggakan</div>
+          </div>
+          <div class="stat stat-clickable" id="stat-duplikat-motor-wrap" style="display:none" onclick="filterMotorByStat('duplikat')" title="Klik untuk melihat motor dengan No. Polisi yang sama (Duplikat)">
+            <div class="stat-icon-wrap stat-icon-rose"><i class="fa-solid fa-copy"></i></div>
+            <div class="stat-num" id="s-motor-duplikat" style="font-size:15px;padding-top:6px;color:var(--rose)">0 Unit</div>
+            <div class="stat-lbl">Data Duplikat</div>
+          </div>
+        </div>
+
+        <!-- Alert Duplikat Banner Motor -->
+        <div id="alert-duplikat-motor" style="display:none;background:rgba(224,91,91,0.12);border:1px solid rgba(224,91,91,0.35);border-radius:12px;padding:12px 18px;margin-bottom:16px;cursor:pointer;align-items:center;justify-content:space-between;transition:all 0.2s" onclick="filterMotorByStat('duplikat')">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:34px;height:34px;border-radius:8px;background:rgba(224,91,91,0.22);display:flex;align-items:center;justify-content:center;color:var(--rose);font-size:16px;flex-shrink:0">
+              <i class="fa-solid fa-clone"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;color:var(--rose);font-size:13px" id="alert-duplikat-motor-text">Terdeteksi Data Duplikat</div>
+              <div style="font-size:12px;color:var(--text-2)">Ditemukan sepeda motor dengan No. Polisi yang sama persis. Klik di sini untuk melihat &amp; merapikan data.</div>
+            </div>
+          </div>
+          <span class="btn btn-ghost" style="color:var(--rose);border-color:rgba(224,91,91,0.4);font-size:11.5px;padding:5px 12px;pointer-events:none">Lihat Duplikat</span>
+        </div>
+
+        <!-- Toolbar Motor -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search" id="q-motor" placeholder="Cari no. polisi, nama motor, atau pemilik…"
+              oninput="renderMotor()" />
+          </div>
+          <select class="select" id="f-motor-sts" onchange="onSelectFilterMotor()">
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="segera">Jatuh Tempo (≤ 30 Hari)</option>
+            <option value="expired">Expired</option>
+            <option value="tunggakan">Menunggak Pajak</option>
+            <option value="duplikat" id="opt-motor-duplikat" style="display:none;color:var(--rose)">⚠️ Data Duplikat</option>
+          </select>
+        </div>
+
+        <!-- Panel Motor -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-left">
+              <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-list-check"></i></div>
+              <span class="panel-title">Daftar Sepeda Motor</span>
+              <span id="motor-filter-indicator" style="display:none;margin-left:10px;background:rgba(229,169,59,0.15);color:var(--gold);border:1px solid rgba(229,169,59,0.3);padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;align-items:center;gap:6px">
+                <span id="motor-filter-indicator-text">Filter</span>
+                <button onclick="filterMotorByStat('')" style="background:none;border:none;color:inherit;cursor:pointer;font-size:12px;padding:0 2px" title="Reset Filter">&times;</button>
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-gold" onclick="printReport('motor')" style="font-size:12px;padding:7px 14px" title="Cetak atau Simpan sebagai PDF Siap Print">
+                <i class="fa-solid fa-print"></i> Cetak / PDF
+              </button>
+              <button class="btn btn-ghost" onclick="exportExcel('motor')" style="font-size:12px;padding:7px 14px" title="Download Excel (.xls) dengan format rapi &amp; siap print">
+                <i class="fa-solid fa-file-excel" style="color:#22c55e"></i> Excel
+              </button>
+              <button class="btn btn-ghost" onclick="exportData('motor')" style="font-size:12px;padding:7px 12px" title="Download file CSV">
+                <i class="fa-solid fa-file-csv"></i> CSV
+              </button>
+            </div>
+          </div>
+          <div class="entries" id="list-motor">
+            <div class="empty">
+              <div class="empty-icon"><i class="fa-solid fa-motorcycle"></i></div>
+              <div class="empty-title">Belum ada data motor</div>
+              <div class="empty-desc">Klik <strong>Tambah Motor</strong> untuk menambahkan data baru</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
          PAGE 2 – RUMAH SEWA
     ══════════════════════════════════════ -->
       <div class="page" id="page-sewa">
@@ -1927,6 +2752,10 @@
             <div class="panel-head-left">
               <div class="panel-icon stat-icon-gold"><i class="fa-solid fa-house-circle-check"></i></div>
               <span class="panel-title">Daftar Rumah Sewa</span>
+              <span id="sewa-filter-indicator" style="display:none;margin-left:10px;background:rgba(229,169,59,0.15);color:var(--gold);border:1px solid rgba(229,169,59,0.3);padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;align-items:center;gap:6px">
+                <span id="sewa-filter-indicator-text">Filter</span>
+                <button onclick="filterSewaByStat('')" style="background:none;border:none;color:inherit;cursor:pointer;font-size:12px;padding:0 2px" title="Reset Filter">&times;</button>
+              </span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <button class="btn btn-gold" onclick="printReport('sewa')" style="font-size:12px;padding:7px 14px" title="Cetak atau Simpan sebagai PDF Siap Print">
@@ -2214,14 +3043,15 @@
       </div>
       <div class="mbody">
         <input type="hidden" id="cp-id" />
+        <input type="hidden" id="cp-targetType" value="pajak" />
 
         <!-- Summary Box -->
         <div
           style="background:var(--bg-3);border:1px solid var(--border-light);border-radius:14px;padding:16px 18px;margin-bottom:18px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span
+            <span id="cp-type-badge"
               style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase"><i
-                class="fa-solid fa-car-side" style="margin-right:4px"></i>Kendaraan</span>
+                class="fa-solid fa-car-side" id="cp-type-icon" style="margin-right:4px"></i><span id="cp-type-text">Kendaraan</span></span>
             <span id="cp-status-pill" class="pill pill-expired">Expired</span>
           </div>
           <div id="cp-unit-name" style="font-size:16px;font-weight:800;color:var(--text-1)">–</div>
@@ -2454,7 +3284,7 @@
     <div class="modal">
       <div class="mhd">
         <div class="mhd-left">
-          <div class="mhd-icon"><i class="fa-solid fa-car-side"></i></div>
+          <div class="mhd-icon" id="mIcon-pajak"><i class="fa-solid fa-car-side"></i></div>
           <div>
             <div class="mhd-title" id="mTitle-pajak">Tambah Kendaraan</div>
             <div class="mhd-sub">Isi semua field bertanda * wajib diisi</div>
@@ -2464,11 +3294,12 @@
       </div>
       <div class="mbody">
         <input type="hidden" id="p-id" />
+        <input type="hidden" id="p-targetType" value="pajak" />
         <div class="form-section">
-          <div class="form-section-title"><i class="fa-solid fa-car"></i> Identitas Kendaraan</div>
+          <div class="form-section-title" id="mSecTitle-pajak"><i class="fa-solid fa-car"></i> Identitas Kendaraan</div>
           <div class="fg">
             <div class="fgroup">
-              <label class="flabel">Nama Unit Kendaraan <span>*</span></label>
+              <label class="flabel" id="mLbl-namaUnit">Nama Unit Kendaraan <span>*</span></label>
               <input type="text" class="finput" id="p-namaUnit" placeholder="Contoh: Toyota Avanza Veloz" />
             </div>
             <div class="fgroup">
@@ -2682,6 +3513,7 @@
     /* ─── STATE ─────────────────────────────── */
     var S = {
       pajak: [],
+      motor: [],
       sewa: [],
       admin: {
         emails: [], emailsPajak: [], emailsSewa: [],
@@ -2691,7 +3523,7 @@
         pin: 46636
       }
     };
-    var editId = { pajak: null, sewa: null };
+    var editId = { pajak: null, motor: null, sewa: null };
 
     /* ─── UTILS ─────────────────────────────── */
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
@@ -2713,16 +3545,24 @@
       var v = (document.getElementById(id).value || '').replace(/\./g, '').replace(/,/g, '');
       return v ? parseInt(v, 10) || 0 : 0;
     }
-    function setFmt(id, num) {
+    function setFmt(id, val) {
       var el = document.getElementById(id);
       if (!el) return;
-      var n = parseInt(num) || 0;
+      var n = parseInt(val) || 0;
       el.value = n ? n.toLocaleString('id-ID') : '';
+    }
+    function num(v) {
+      if (!v && v !== 0) return 0;
+      if (typeof v === 'number') return isNaN(v) ? 0 : v;
+      var clean = String(v).replace(/[^\d.-]/g, '');
+      var n = parseFloat(clean);
+      return isNaN(n) ? 0 : n;
     }
     function fdate(d) {
       if (!d) return '–';
       try { return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) } catch (e) { return d }
     }
+    function fmtDate(d) { return fdate(d); }
     function daysTo(ds) {
       if (!ds) return 9999;
       var n = new Date(); n.setHours(0, 0, 0, 0);
@@ -2784,8 +3624,13 @@
       }
       document.querySelectorAll('.tab').forEach(function (b) { b.classList.remove('active') });
       document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active') });
-      document.getElementById('tab-' + t).classList.add('active');
-      document.getElementById('page-' + t).classList.add('active');
+      var elTab = document.getElementById('tab-' + t);
+      var elPage = document.getElementById('page-' + t);
+      if (elTab) elTab.classList.add('active');
+      if (elPage) elPage.classList.add('active');
+      if (t === 'dashboard') {
+        renderDashboard();
+      }
     }
 
     function openPinModal() {
@@ -2815,10 +3660,12 @@
             openModal(act.args[0], act.args[1]);
           } else if (act.type === 'delPajak') {
             delPajak(act.args[0]);
+          } else if (act.type === 'delMotor') {
+            delMotor(act.args[0]);
           } else if (act.type === 'delSewa') {
             delSewa(act.args[0]);
           } else if (act.type === 'confirmPajak') {
-            openConfirmPajakModal(act.args[0]);
+            openConfirmPajakModal(act.args[0], act.args[1]);
           } else if (act.type === 'confirmSewa') {
             openConfirmSewaModal(act.args[0]);
           }
@@ -2855,12 +3702,37 @@
         openPinModal();
         return;
       }
-      if (type === 'pajak') {
-        document.getElementById('mTitle-pajak').textContent = id ? 'Edit Kendaraan' : 'Tambah Kendaraan';
+      if (type === 'pajak' || type === 'motor') {
+        var isMotor = (type === 'motor');
+        var targetTypeEl = document.getElementById('p-targetType');
+        if (targetTypeEl) targetTypeEl.value = type;
+
+        var titleEl = document.getElementById('mTitle-pajak');
+        if (titleEl) {
+          if (isMotor) {
+            titleEl.textContent = id ? 'Edit Sepeda Motor' : 'Tambah Motor';
+          } else {
+            titleEl.textContent = id ? 'Edit Mobil' : 'Tambah Mobil';
+          }
+        }
+
+        var iconEl = document.getElementById('mIcon-pajak');
+        if (iconEl) iconEl.innerHTML = isMotor ? '<i class="fa-solid fa-motorcycle"></i>' : '<i class="fa-solid fa-car-side"></i>';
+
+        var secTitleEl = document.getElementById('mSecTitle-pajak');
+        if (secTitleEl) secTitleEl.innerHTML = isMotor ? '<i class="fa-solid fa-motorcycle"></i> Identitas Sepeda Motor' : '<i class="fa-solid fa-car"></i> Identitas Mobil';
+
+        var lblUnitEl = document.getElementById('mLbl-namaUnit');
+        if (lblUnitEl) lblUnitEl.innerHTML = (isMotor ? 'Nama Unit Sepeda Motor' : 'Nama Unit Mobil') + ' <span>*</span>';
+
+        var inputUnitEl = document.getElementById('p-namaUnit');
+        if (inputUnitEl) inputUnitEl.placeholder = isMotor ? 'Contoh: Honda Vario 160' : 'Contoh: Toyota Avanza Veloz';
+
+        var src = isMotor ? S.motor : S.pajak;
         if (id) {
-          var d = S.pajak.find(function (x) { return x.id === id });
+          var d = src.find(function (x) { return x.id === id });
           if (d) {
-            editId.pajak = id;
+            editId[type] = id;
             document.getElementById('p-id').value = id;
             document.getElementById('p-namaUnit').value = d.namaUnit || '';
             document.getElementById('p-nopol').value = d.nopol || '';
@@ -2880,7 +3752,7 @@
             document.getElementById('badge-nextStnk').style.display = d.nextJatuhTempoStnk ? 'inline-flex' : 'none';
           }
         } else {
-          editId.pajak = null;
+          editId[type] = null;
           ['p-id', 'p-namaUnit', 'p-nopol', 'p-atasNama', 'p-warna', 'p-jatuhTempo', 'p-nominal', 'p-tglBayar', 'p-nextJatuhTempo', 'p-jatuhTempoStnk', 'p-nominalStnk', 'p-tglStnk', 'p-nextJatuhTempoStnk', 'p-keterangan'].forEach(function (f) { document.getElementById(f).value = '' });
           document.getElementById('badge-nextPajak').style.display = 'none';
           document.getElementById('badge-nextStnk').style.display = 'none';
@@ -2912,9 +3784,19 @@
         document.getElementById('ov-sewa').classList.add('open');
       }
     }
-    function closeModal(t) { document.getElementById('ov-' + t).classList.remove('open'); editId[t] = null }
+    function closeModal(t) {
+      var ovId = (t === 'motor' || t === 'pajak') ? 'ov-pajak' : ('ov-' + t);
+      var el = document.getElementById(ovId);
+      if (el) el.classList.remove('open');
+      if (editId[t] !== undefined) editId[t] = null;
+    }
     document.querySelectorAll('.overlay').forEach(function (o) {
-      o.addEventListener('click', function (e) { if (e.target === this) closeModal(this.id.replace('ov-', '')) })
+      o.addEventListener('click', function (e) {
+        if (e.target === this) {
+          var key = this.id.replace('ov-', '');
+          closeModal(key);
+        }
+      })
     });
 
     /* ─── AUTO-CALC NEXT TEMPO ──────────────── */
@@ -3015,16 +3897,20 @@
       }
     }
 
-    /* ─── PAJAK CRUD ─────────────────────────── */
+    /* ─── PAJAK & MOTOR CRUD ────────────────── */
     function savePajak() {
       if (!adminUnlocked) { openPinModal(); return; }
+      var targetType = (document.getElementById('p-targetType') && document.getElementById('p-targetType').value) || 'pajak';
+      var isMotor = (targetType === 'motor');
       var nu = document.getElementById('p-namaUnit').value.trim();
       var np = document.getElementById('p-nopol').value.trim().toUpperCase();
       var an = document.getElementById('p-atasNama').value.trim();
       var jt = document.getElementById('p-jatuhTempo').value;
       if (!nu || !np || !an || !jt) { toast('Harap isi semua field wajib (*)', 'err'); return }
+
+      var currentEditId = isMotor ? editId.motor : editId.pajak;
       var d = {
-        id: editId.pajak || uid(),
+        id: currentEditId || uid(),
         namaUnit: nu, nopol: np, atasNama: an,
         warna: document.getElementById('p-warna').value.trim(),
         jatuhTempo: jt,
@@ -3041,15 +3927,23 @@
       if (!d.createdAt) d.createdAt = new Date().toISOString();
 
       // Simpan optimistis ke state lokal dulu agar UI responsif
-      var isEdit = !!editId.pajak;
-      if (isEdit) { var ix = S.pajak.findIndex(function (x) { return x.id === editId.pajak }); if (ix !== -1) S.pajak[ix] = d; }
-      else { S.pajak.unshift(d); }
-      closeModal('pajak'); renderPajak(); badges();
+      var isEdit = !!currentEditId;
+      var targetArr = isMotor ? S.motor : S.pajak;
+      if (isEdit) {
+        var ix = targetArr.findIndex(function (x) { return x.id === currentEditId });
+        if (ix !== -1) targetArr[ix] = d;
+      } else {
+        targetArr.unshift(d);
+      }
+
+      closeModal('pajak');
+      if (isMotor) renderMotor(); else renderPajak();
+      badges();
       saveLocalCache();
 
-      callGasApi('saveRecord', { type: 'pajak', data: d }, function (r) {
+      callGasApi('saveRecord', { type: targetType, data: d }, function (r) {
         if (r && r.success) {
-          toast(isEdit ? 'Data kendaraan diperbarui!' : 'Kendaraan berhasil ditambahkan!');
+          toast(isEdit ? (isMotor ? 'Data motor diperbarui!' : 'Data mobil diperbarui!') : (isMotor ? 'Sepeda motor berhasil ditambahkan!' : 'Mobil berhasil ditambahkan!'));
           clearLocalCache();
         } else {
           toast('⚠️ Tersimpan lokal, gagal ke Sheet: ' + ((r && r.message) || 'Cek URL GAS'), 'warn');
@@ -3058,23 +3952,43 @@
         toast('⚠️ Gagal kirim ke Sheet: ' + (e.message || e), 'warn');
       });
     }
+
     function delPajak(id) {
       if (!adminUnlocked) {
         pendingAction = { type: 'delPajak', args: [id] };
         openPinModal();
         return;
       }
-      if (!confirm('Hapus data kendaraan ini?')) return;
+      if (!confirm('Hapus data mobil ini?')) return;
       S.pajak = S.pajak.filter(function (x) { return x.id !== id });
       renderPajak(); badges();
       saveLocalCache();
       callGasApi('deleteRecord', { type: 'pajak', id: id }, function (r) {
-        if (r && r.success) { toast('Kendaraan dihapus.', 'warn'); clearLocalCache(); }
+        if (r && r.success) { toast('Mobil dihapus.', 'warn'); clearLocalCache(); }
         else toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet', 'warn');
       }, function (e) {
         toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet: ' + (e.message || e), 'warn');
       });
     }
+
+    function delMotor(id) {
+      if (!adminUnlocked) {
+        pendingAction = { type: 'delMotor', args: [id] };
+        openPinModal();
+        return;
+      }
+      if (!confirm('Hapus data sepeda motor ini?')) return;
+      S.motor = S.motor.filter(function (x) { return x.id !== id });
+      renderMotor(); badges();
+      saveLocalCache();
+      callGasApi('deleteRecord', { type: 'motor', id: id }, function (r) {
+        if (r && r.success) { toast('Sepeda motor dihapus.', 'warn'); clearLocalCache(); }
+        else toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet', 'warn');
+      }, function (e) {
+        toast('⚠️ Hapus lokal berhasil, gagal sinkron ke Sheet: ' + (e.message || e), 'warn');
+      });
+    }
+
     /* ─── HITUNG TUNGGAKAN PAJAK KUMULATIF ─────────────────────────────────── */
     // Pajak kendaraan bersifat tahunan. Jika belum dibayar beberapa tahun,
     // estimasi tunggakan = nominal × jumlah tahun yang terlewat.
@@ -3086,6 +4000,7 @@
       var tahunLewat = Math.ceil(Math.abs(dd) / 365);
       return nominal * tahunLewat;
     }
+
     /* ─── FILTER & STATS INTERACTIVITY & DUPLICATE DETECTION ─── */
     var activePajakFilter = '';
 
@@ -3104,15 +4019,18 @@
 
     function checkNopolDuplicate() {
       var val = document.getElementById('p-nopol').value;
-      var editId = document.getElementById('p-id') ? document.getElementById('p-id').value : '';
+      var editIdVal = document.getElementById('p-id') ? document.getElementById('p-id').value : '';
       var warnEl = document.getElementById('p-nopol-dupe-warn');
       var descEl = document.getElementById('p-nopol-dupe-desc');
       if (!warnEl) return;
       var norm = normalizeNopol(val);
       if (!norm) { warnEl.style.display = 'none'; return; }
 
-      var match = S.pajak.find(function (d) {
-        return d.id !== editId && normalizeNopol(d.nopol) === norm;
+      var targetType = (document.getElementById('p-targetType') && document.getElementById('p-targetType').value) || 'pajak';
+      var src = (targetType === 'motor') ? S.motor : S.pajak;
+
+      var match = src.find(function (d) {
+        return d.id !== editIdVal && normalizeNopol(d.nopol) === norm;
       });
 
       if (match) {
@@ -3128,6 +4046,10 @@
         activePajakFilter = '';
       } else {
         activePajakFilter = st;
+      }
+      if (!st) {
+        var qInput = document.getElementById('q-pajak');
+        if (qInput) qInput.value = '';
       }
       var sel = document.getElementById('f-pajak-sts');
       if (sel) sel.value = activePajakFilter;
@@ -3187,7 +4109,7 @@
           var dupePill = isDupe ?
             ' <span class="stat-badge-dupe" title="No. Polisi ini terdaftar lebih dari 1 kali"><i class="fa-solid fa-copy"></i> Duplikat (' + nopolCounts[normalizeNopol(d.nopol)] + ' Data)</span>' : '';
 
-          return '<div class="entry' + (isDupe ? ' entry-dupe' : '') + '">' +
+          return '<div class="entry' + (isDupe ? ' entry-dupe' : '') + '" id="entry-pajak-' + d.id + '">' +
             '<div class="entry-top">' +
             '<div class="entry-meta">' +
             '<div class="entry-label"><i class="fa-solid fa-car-side" style="color:var(--gold);margin-right:5px"></i>Kendaraan' + dupePill + '</div>' +
@@ -3313,6 +4235,200 @@
           };
           indTxt.textContent = 'Filter: ' + (labelMap[sf] || sf);
           ind.style.display = 'inline-flex';
+        } else if (q) {
+          indTxt.textContent = 'Menampilkan: "' + q + '" (' + fd.length + ' unit)';
+          ind.style.display = 'inline-flex';
+        } else {
+          ind.style.display = 'none';
+        }
+      }
+    }
+
+    /* ─── MOTOR FILTER & RENDERING ───────────── */
+    var activeMotorFilter = '';
+
+    function getDuplicateNopolsMotor() {
+      var counts = {};
+      S.motor.forEach(function (d) {
+        var n = normalizeNopol(d.nopol);
+        if (n) counts[n] = (counts[n] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function filterMotorByStat(st) {
+      if (activeMotorFilter === st) {
+        activeMotorFilter = '';
+      } else {
+        activeMotorFilter = st;
+      }
+      if (!st) {
+        var qInput = document.getElementById('q-motor');
+        if (qInput) qInput.value = '';
+      }
+      var sel = document.getElementById('f-motor-sts');
+      if (sel) sel.value = activeMotorFilter;
+      renderMotor();
+
+      if (activeMotorFilter) {
+        var el = document.getElementById('list-motor');
+        if (el) {
+          var y = el.getBoundingClientRect().top + window.scrollY - 130;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }
+      }
+    }
+
+    function onSelectFilterMotor() {
+      var sel = document.getElementById('f-motor-sts');
+      activeMotorFilter = sel ? sel.value : '';
+      renderMotor();
+    }
+
+    function renderMotor() {
+      var q = (document.getElementById('q-motor') ? document.getElementById('q-motor').value : '').toLowerCase();
+      var sel = document.getElementById('f-motor-sts');
+      var sf = sel ? sel.value : activeMotorFilter;
+      activeMotorFilter = sf;
+      var list = document.getElementById('list-motor');
+      if (!list) return;
+
+      var nopolCounts = getDuplicateNopolsMotor();
+      var dupeCount = 0;
+      S.motor.forEach(function (d) {
+        if ((nopolCounts[normalizeNopol(d.nopol)] || 0) > 1) dupeCount++;
+      });
+
+      // Filter data
+      var fd = S.motor.filter(function (d) {
+        var m = (d.namaUnit || '').toLowerCase().includes(q) || (d.nopol || '').toLowerCase().includes(q) || (d.atasNama || '').toLowerCase().includes(q);
+        if (!m) return false;
+        if (sf === 'tunggakan') {
+          if (hitungTunggakanPajak(d) <= 0) return false;
+        } else if (sf === 'duplikat') {
+          if ((nopolCounts[normalizeNopol(d.nopol)] || 0) <= 1) return false;
+        } else if (sf && sts(daysTo(d.jatuhTempo)).cls !== sf) {
+          return false;
+        }
+        return true;
+      });
+
+      if (!fd.length) {
+        list.innerHTML = '<div class="empty"><div class="empty-icon"><i class="fa-solid fa-motorcycle"></i></div><div class="empty-title">Tidak ada data ditemukan</div><div class="empty-desc">Coba ubah filter atau kata kunci pencarian</div></div>';
+      } else {
+        list.innerHTML = fd.map(function (d) {
+          var st = sts(daysTo(d.jatuhTempo));
+          var stStnk = d.jatuhTempoStnk ? sts(daysTo(d.jatuhTempoStnk)) : null;
+          var tunggakan = hitungTunggakanPajak(d);
+          var tahunLewat = d.jatuhTempo && daysTo(d.jatuhTempo) < 0 ? Math.ceil(Math.abs(daysTo(d.jatuhTempo)) / 365) : 0;
+          var isDupe = (nopolCounts[normalizeNopol(d.nopol)] || 0) > 1;
+          var dupePill = isDupe ?
+            ' <span class="stat-badge-dupe" title="No. Polisi ini terdaftar lebih dari 1 kali"><i class="fa-solid fa-copy"></i> Duplikat (' + nopolCounts[normalizeNopol(d.nopol)] + ' Data)</span>' : '';
+
+          return '<div class="entry' + (isDupe ? ' entry-dupe' : '') + '" id="entry-motor-' + d.id + '">' +
+            '<div class="entry-top">' +
+            '<div class="entry-meta">' +
+            '<div class="entry-label"><i class="fa-solid fa-motorcycle" style="color:var(--gold);margin-right:5px"></i>Sepeda Motor' + dupePill + '</div>' +
+            '<div class="entry-name">' + esc(d.namaUnit) + '</div>' +
+            '<div class="entry-sub"><strong>' + esc(d.nopol) + '</strong> &nbsp;·&nbsp; Pengguna: <strong>' + esc(d.atasNama) + '</strong>' + (d.warna ? ' &nbsp;·&nbsp; ' + esc(d.warna) : '') + ' </div>' +
+            '</div>' +
+            '<div class="entry-right">' +
+            '<span class="pill pill-' + st.cls + '"><i class="fa-solid fa-circle"></i>' + st.label + '</span>' +
+            '<button class="btn btn-icon btn-edit-ic" onclick="openModal(\'motor\',\'' + d.id + '\')" title="Edit"><i class="fa-solid fa-pen"></i></button>' +
+            '<button class="btn btn-icon btn-del-ic" onclick="delMotor(\'' + d.id + '\')" title="Hapus"><i class="fa-solid fa-trash"></i></button>' +
+            '</div>' +
+            '</div>' +
+            '<div class="entry-grid">' +
+            '<div><div class="ef-label">Jatuh Tempo Pajak</div><div class="ef-val ' + st.cls + '">' + fdate(d.jatuhTempo) + '</div></div>' +
+            '<div><div class="ef-label">Tgl Pembayaran Pajak</div><div class="ef-val">' + fdate(d.tglBayar) + '</div></div>' +
+            '<div><div class="ef-label">Nominal Pajak / Tahun</div><div class="ef-val gold">' + cur(d.nominal) + '</div></div>' +
+            (tunggakan > 0 ?
+              '<div style="grid-column:1/-1;background:rgba(224,91,91,0.08);border:1px solid rgba(224,91,91,0.25);border-radius:10px;padding:10px 14px;margin-top:4px">' +
+              '<div class="ef-label" style="color:var(--rose)"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px"></i>Estimasi Tunggakan (' + tahunLewat + ' tahun)</div>' +
+              '<div class="ef-val" style="color:var(--rose);font-size:15px;font-weight:800">' + cur(tunggakan) + '</div>' +
+              '<div style="font-size:10.5px;color:var(--text-3);margin-top:3px">' + cur(parseInt(d.nominal) || 0) + ' &times; ' + tahunLewat + ' tahun belum dibayar</div>' +
+              '</div>'
+              : '') +
+            (d.nextJatuhTempo ? '<div><div class="ef-label" style="color:var(--amber)">Tempo Pajak Selanjutnya</div><div class="ef-val segera" style="color:var(--amber)">' + fdate(d.nextJatuhTempo) + '</div></div>' : '') +
+            '<div style="grid-column:1/-1;height:1px;background:var(--border);margin:4px 0"></div>' +
+            '<div><div class="ef-label">Jatuh Tempo STNK <span style="color:var(--text-3);font-weight:500">(5 thn)</span></div><div class="ef-val ' + (stStnk ? stStnk.cls : '') + '">' + fdate(d.jatuhTempoStnk) + '</div></div>' +
+            '<div><div class="ef-label">Tgl Pembayaran STNK</div><div class="ef-val">' + fdate(d.tglStnk) + '</div></div>' +
+            '<div><div class="ef-label">Nominal STNK</div><div class="ef-val gold">' + cur(d.nominalStnk) + '</div></div>' +
+            (d.nextJatuhTempoStnk ? '<div><div class="ef-label" style="color:var(--amber)">Tempo STNK Selanjutnya</div><div class="ef-val segera" style="color:var(--amber)">' + fdate(d.nextJatuhTempoStnk) + '</div></div>' : '') +
+            (d.keterangan ? '<div style="grid-column:1/-1"><div class="ef-label">Keterangan</div><div class="ef-val">' + esc(d.keterangan) + '</div></div>' : '') +
+            (st.cls === 'expired' || st.cls === 'segera' || tunggakan > 0 ?
+              '<div class="btn-confirm-action" style="grid-column:1/-1;margin-top:10px">' +
+              '<button class="btn btn-gold" style="width:100%;justify-content:center;background:linear-gradient(135deg,#2bb5a0,#3dba80);color:#0a1a12;font-weight:700;padding:10px 14px;box-shadow:0 4px 14px rgba(43,181,160,0.25)" onclick="openConfirmPajakModal(\'' + d.id + '\', \'motor\')">' +
+              '<i class="fa-solid fa-circle-check"></i> Konfirmasi Pembayaran Pajak' +
+              '</button>' +
+              '</div>'
+              : '') +
+            '</div></div>';
+        }).join('');
+      }
+
+      // Stats Motor
+      var segeraCount = S.motor.filter(function (d) { var dd = daysTo(d.jatuhTempo); return dd >= 0 && dd <= 30 }).length;
+      var expCount = S.motor.filter(function (d) { return daysTo(d.jatuhTempo) < 0 }).length;
+      var totNomPajak = S.motor.reduce(function (a, d) { return a + (parseInt(d.nominal) || 0) }, 0);
+      var nomPajakSegera = S.motor.reduce(function (a, d) {
+        var dd = daysTo(d.jatuhTempo);
+        return (dd >= 0 && dd <= 30) ? a + (parseInt(d.nominal) || 0) : a;
+      }, 0);
+      var totTunggakan = S.motor.reduce(function (a, d) { return a + hitungTunggakanPajak(d) }, 0);
+
+      var elTot = document.getElementById('s-total-motor'); if (elTot) elTot.textContent = S.motor.length;
+      var elSeg = document.getElementById('s-motor-segera'); if (elSeg) elSeg.textContent = segeraCount;
+      var elNomSeg = document.getElementById('s-nom-motor-segera'); if (elNomSeg) elNomSeg.textContent = cur(nomPajakSegera);
+      var elExp = document.getElementById('s-motor-exp'); if (elExp) elExp.textContent = expCount;
+      var elNom = document.getElementById('s-nom-motor'); if (elNom) elNom.textContent = cur(totNomPajak);
+
+      var wrapTunggakan = document.getElementById('stat-tunggakan-motor-wrap');
+      var valTunggakan = document.getElementById('s-nom-motor-tunggakan');
+      if (wrapTunggakan && valTunggakan) {
+        if (totTunggakan > 0) {
+          wrapTunggakan.style.display = 'block';
+          valTunggakan.textContent = cur(totTunggakan);
+        } else {
+          wrapTunggakan.style.display = 'none';
+        }
+      }
+
+      var wrapDupe = document.getElementById('stat-duplikat-motor-wrap');
+      var valDupe = document.getElementById('s-motor-duplikat');
+      var alertDupe = document.getElementById('alert-duplikat-motor');
+      var alertDupeText = document.getElementById('alert-duplikat-motor-text');
+      var optDupe = document.getElementById('opt-motor-duplikat');
+
+      if (dupeCount > 0) {
+        if (wrapDupe) { wrapDupe.style.display = 'block'; valDupe.textContent = dupeCount + ' Unit'; }
+        if (alertDupe) {
+          alertDupe.style.display = 'flex';
+          if (alertDupeText) alertDupeText.textContent = 'Terdeteksi ' + dupeCount + ' Sepeda Motor dengan Data Duplikat';
+        }
+        if (optDupe) optDupe.style.display = 'block';
+      } else {
+        if (wrapDupe) wrapDupe.style.display = 'none';
+        if (alertDupe) alertDupe.style.display = 'none';
+        if (optDupe) optDupe.style.display = 'none';
+      }
+
+      var ind = document.getElementById('motor-filter-indicator');
+      var indTxt = document.getElementById('motor-filter-indicator-text');
+      if (ind && indTxt) {
+        if (sf) {
+          var labelMap = {
+            'aktif': 'Status: Aktif (' + fd.length + ')',
+            'segera': 'Jatuh Tempo ≤ 30 Hari (' + fd.length + ')',
+            'expired': 'Pajak Expired (' + fd.length + ')',
+            'tunggakan': 'Menunggak Pajak (' + fd.length + ')',
+            'duplikat': 'Data Duplikat (' + fd.length + ')'
+          };
+          indTxt.textContent = labelMap[sf] || ('Filter: ' + sf);
+          ind.style.display = 'inline-flex';
+        } else if (q) {
+          indTxt.textContent = 'Menampilkan: "' + q + '" (' + fd.length + ' unit)';
+          ind.style.display = 'inline-flex';
         } else {
           ind.style.display = 'none';
         }
@@ -3320,18 +4436,29 @@
     }
 
     /* ─── KONFIRMASI PEMBAYARAN PAJAK ───────────────────────── */
-    function openConfirmPajakModal(id) {
+    function openConfirmPajakModal(id, targetType) {
       if (!adminUnlocked) {
-        pendingAction = { type: 'confirmPajak', args: [id] };
+        pendingAction = { type: 'confirmPajak', args: [id, targetType] };
         openPinModal();
         return;
       }
-      var d = S.pajak.find(function (x) { return x.id === id });
+      targetType = targetType || 'pajak';
+      var src = targetType === 'motor' ? S.motor : S.pajak;
+      var d = src.find(function (x) { return x.id === id });
       if (!d) return;
+
       document.getElementById('cp-id').value = id;
+      var cpTarget = document.getElementById('cp-targetType');
+      if (cpTarget) cpTarget.value = targetType;
+
       document.getElementById('cp-unit-name').textContent = d.namaUnit;
       document.getElementById('cp-unit-sub').textContent = d.nopol + ' · Pengguna: ' + d.atasNama;
       document.getElementById('cp-due-date').textContent = fdate(d.jatuhTempo);
+
+      var typeIcon = document.getElementById('cp-type-icon');
+      var typeText = document.getElementById('cp-type-text');
+      if (typeIcon) typeIcon.className = targetType === 'motor' ? 'fa-solid fa-motorcycle' : 'fa-solid fa-car-side';
+      if (typeText) typeText.textContent = targetType === 'motor' ? 'Sepeda Motor' : 'Mobil';
 
       var tunggakan = hitungTunggakanPajak(d);
       var target = tunggakan > 0 ? tunggakan : (parseInt(d.nominal) || 0);
@@ -3360,7 +4487,9 @@
 
     function calcConfirmPajak() {
       var id = document.getElementById('cp-id').value;
-      var d = S.pajak.find(function (x) { return x.id === id });
+      var targetType = (document.getElementById('cp-targetType') && document.getElementById('cp-targetType').value) || 'pajak';
+      var src = targetType === 'motor' ? S.motor : S.pajak;
+      var d = src.find(function (x) { return x.id === id });
       if (!d) return;
 
       var tglBayar = document.getElementById('cp-tglBayar').value;
@@ -3397,7 +4526,10 @@
 
     function processConfirmPajak() {
       var id = document.getElementById('cp-id').value;
-      var d = S.pajak.find(function (x) { return x.id === id });
+      var targetType = (document.getElementById('cp-targetType') && document.getElementById('cp-targetType').value) || 'pajak';
+      var isMotor = targetType === 'motor';
+      var src = isMotor ? S.motor : S.pajak;
+      var d = src.find(function (x) { return x.id === id });
       if (!d) return;
 
       var tglBayar = document.getElementById('cp-tglBayar').value;
@@ -3445,11 +4577,11 @@
       d.keterangan = d.keterangan ? (d.keterangan + ' | ' + note) : note;
 
       closeModal('confirm-pajak');
-      renderPajak();
+      if (isMotor) renderMotor(); else renderPajak();
       badges();
       saveLocalCache();
 
-      callGasApi('saveRecord', { type: 'pajak', data: d }, function (r) {
+      callGasApi('saveRecord', { type: targetType, data: d }, function (r) {
         if (r && r.success) {
           toast('🎉 Pembayaran Pajak ' + esc(d.namaUnit) + ' berhasil dikonfirmasi!', 'ok');
           clearLocalCache();
@@ -3738,7 +4870,7 @@
             '</button>' +
             '</div>' : '';
 
-          return '<div class="entry">' +
+          return '<div class="entry" id="entry-sewa-' + d.id + '">' +
             '<div class="entry-top">' +
             '<div class="entry-meta">' +
             '<div class="entry-label"><i class="fa-solid fa-house-chimney" style="color:var(--gold);margin-right:5px"></i>Rumah Sewa</div>' +
@@ -3776,12 +4908,443 @@
       document.getElementById('s-nom-sewa-segera').textContent = cur(nomSewaSegera);
       document.getElementById('s-sewa-exp').textContent = activeSewa.filter(function (d) { return daysTo(d.tglBerakhir) < 0 }).length;
       document.getElementById('s-biaya-sewa').textContent = cur(tb2);
+
+      var ind = document.getElementById('sewa-filter-indicator');
+      var indTxt = document.getElementById('sewa-filter-indicator-text');
+      if (ind && indTxt) {
+        if (sf) {
+          var labelMap = {
+            'aktif': 'Aktif (' + fd.length + ')',
+            'segera': 'Jatuh Tempo â‰¤ 30 Hari (' + fd.length + ')',
+            'expired': 'Kontrak Expired (' + fd.length + ')',
+            'selesai': 'Kontrak Selesai (' + fd.length + ')'
+          };
+          indTxt.textContent = 'Filter: ' + (labelMap[sf] || sf);
+          ind.style.display = 'inline-flex';
+        } else if (q) {
+          indTxt.textContent = 'Menampilkan: "' + q + '" (' + fd.length + ' unit)';
+          ind.style.display = 'inline-flex';
+        } else {
+          ind.style.display = 'none';
+        }
+      }
     }
 
-    /* ─── BADGES ────────────────────────────── */
+    function filterSewaByStat(st) {
+      var sel = document.getElementById('f-sewa-sts');
+      if (sel) sel.value = st || '';
+      if (!st) {
+        var qInput = document.getElementById('q-sewa');
+        if (qInput) qInput.value = '';
+      }
+      renderSewa();
+      if (st) {
+        var el = document.getElementById('list-sewa');
+        if (el) {
+          var y = el.getBoundingClientRect().top + window.scrollY - 130;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }
+      }
+    }
+
+    /* â”€â”€â”€ BADGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     function badges() {
       document.getElementById('cnt-pajak').textContent = S.pajak.length;
+      var elCntMotor = document.getElementById('cnt-motor');
+      if (elCntMotor) elCntMotor.textContent = S.motor.length;
       document.getElementById('cnt-sewa').textContent = S.sewa.length;
+      if (typeof renderDashboard === 'function') {
+        renderDashboard();
+      }
+    }
+
+    /* â”€â”€â”€ EXECUTIVE DASHBOARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    function renderDashboard() {
+      try {
+        var mobil = S.pajak || [];
+        var motor = S.motor || [];
+        var sewa = (S.sewa || []).filter(function (d) { 
+          return d.statusSewa ? (d.statusSewa !== 'Selesai') : (!d.status || d.status === 'Aktif'); 
+        });
+
+        // 1. Mobil Stats
+        var mobTot = mobil.length;
+        var mobNom = 0;
+        var mobAktif = 0;
+        var mobSegera = 0;
+        var mobExp = 0;
+        var mobSegeraNom = 0;
+        var mobExpNom = 0;
+
+        mobil.forEach(function (d) {
+          var n = num(d.nominal != null ? d.nominal : d.nomPajak) || 0;
+          mobNom += n;
+          var tgl = d.jatuhTempo || d.tglPajak;
+          var dt = daysTo(tgl);
+          if (dt < 0) {
+            mobExp++;
+            mobExpNom += (typeof hitungTunggakanPajak === 'function' ? hitungTunggakanPajak(d) : n) || n;
+          } else if (dt <= 30) {
+            mobSegera++;
+            mobSegeraNom += n;
+          } else {
+            mobAktif++;
+          }
+        });
+
+        // 2. Motor Stats
+        var motTot = motor.length;
+        var motNom = 0;
+        var motAktif = 0;
+        var motSegera = 0;
+        var motExp = 0;
+        var motSegeraNom = 0;
+        var motExpNom = 0;
+
+        motor.forEach(function (d) {
+          var n = num(d.nominal != null ? d.nominal : d.nomPajak) || 0;
+          motNom += n;
+          var tgl = d.jatuhTempo || d.tglPajak;
+          var dt = daysTo(tgl);
+          if (dt < 0) {
+            mobExp++;
+            mobExpNom += (typeof hitungTunggakanPajak === 'function' ? hitungTunggakanPajak(d) : n) || n;
+          } else if (dt <= 30) {
+            motSegera++;
+            motSegeraNom += n;
+          } else {
+            motAktif++;
+          }
+        });
+
+        // 3. Sewa Stats
+        var sewTot = sewa.length;
+        var sewNom = 0;
+        var sewAktif = 0;
+        var sewSegera = 0;
+        var sewExp = 0;
+        var sewSegeraNom = 0;
+        var sewExpNom = 0;
+
+        sewa.forEach(function (d) {
+          var n = num(d.biaya != null ? d.biaya : d.nominal) || 0;
+          sewNom += n;
+          var tgl = d.tglBerakhir || d.jatuhTempo;
+          var dt = daysTo(tgl);
+          if (dt < 0) {
+            sewExp++;
+            sewExpNom += n;
+          } else if (dt <= 30) {
+            sewSegera++;
+            sewSegeraNom += n;
+          } else {
+            sewAktif++;
+          }
+        });
+
+        // Global Aggregates
+        var grandTotalAssets = mobTot + motTot + sewTot;
+        var grandUrgentCount = mobSegera + motSegera + sewSegera;
+        var grandUrgentNom = mobSegeraNom + motSegeraNom + sewSegeraNom;
+        var grandExpCount = mobExp + motExp + sewExp;
+        var grandExpNom = mobExpNom + motExpNom + sewExpNom;
+        var grandAnnualBudget = mobNom + motNom + sewNom;
+
+        // Update KPI Top Cards
+        var elTotAssets = document.getElementById('dash-tot-assets');
+        if (elTotAssets) elTotAssets.textContent = grandTotalAssets;
+
+        var elSubMob = document.getElementById('dash-sub-mobil');
+        if (elSubMob) elSubMob.textContent = mobTot + ' Mobil';
+        var elSubMot = document.getElementById('dash-sub-motor');
+        if (elSubMot) elSubMot.textContent = motTot + ' Motor';
+        var elSubSew = document.getElementById('dash-sub-sewa');
+        if (elSubSew) elSubSew.textContent = sewTot + ' Sewa';
+
+        var elUrgNom = document.getElementById('dash-urgent-nom');
+        if (elUrgNom) elUrgNom.textContent = cur(grandUrgentNom);
+        var elUrgCnt = document.getElementById('dash-urgent-cnt');
+        if (elUrgCnt) elUrgCnt.textContent = grandUrgentCount + ' tagihan jatuh tempo (â‰¤ 30 hari)';
+
+        var elExpNom = document.getElementById('dash-exp-nom');
+        if (elExpNom) elExpNom.textContent = cur(grandExpNom);
+        var elExpCnt = document.getElementById('dash-exp-cnt');
+        if (elExpCnt) elExpCnt.textContent = grandExpCount + ' unit telah lewat jatuh tempo (expired)';
+
+        var elBudget = document.getElementById('dash-annual-budget');
+        if (elBudget) elBudget.textContent = cur(grandAnnualBudget);
+
+        // Update Category Comparison Cards
+        // Mobil
+        var elCatMobCnt = document.getElementById('dash-cat-mobil-cnt');
+        if (elCatMobCnt) elCatMobCnt.textContent = mobTot + ' Unit';
+        var elCatMobNom = document.getElementById('dash-cat-mobil-nom');
+        if (elCatMobNom) elCatMobNom.textContent = cur(mobNom);
+        var elCatMobAktif = document.getElementById('dash-cat-mobil-aktif');
+        if (elCatMobAktif) elCatMobAktif.textContent = mobAktif;
+        var elCatMobSegera = document.getElementById('dash-cat-mobil-segera');
+        if (elCatMobSegera) elCatMobSegera.textContent = mobSegera;
+        var elCatMobExp = document.getElementById('dash-cat-mobil-exp');
+        if (elCatMobExp) elCatMobExp.textContent = mobExp;
+
+        // Motor
+        var elCatMotCnt = document.getElementById('dash-cat-motor-cnt');
+        if (elCatMotCnt) elCatMotCnt.textContent = motTot + ' Unit';
+        var elCatMotNom = document.getElementById('dash-cat-motor-nom');
+        if (elCatMotNom) elCatMotNom.textContent = cur(motNom);
+        var elCatMotAktif = document.getElementById('dash-cat-motor-aktif');
+        if (elCatMotAktif) elCatMotAktif.textContent = motAktif;
+        var elCatMotSegera = document.getElementById('dash-cat-motor-segera');
+        if (elCatMotSegera) elCatMotSegera.textContent = motSegera;
+        var elCatMotExp = document.getElementById('dash-cat-motor-exp');
+        if (elCatMotExp) elCatMotExp.textContent = motExp;
+
+        // Sewa
+        var elCatSewCnt = document.getElementById('dash-cat-sewa-cnt');
+        if (elCatSewCnt) elCatSewCnt.textContent = sewTot + ' Unit';
+        var elCatSewNom = document.getElementById('dash-cat-sewa-nom');
+        if (elCatSewNom) elCatSewNom.textContent = cur(sewNom);
+        var elCatSewAktif = document.getElementById('dash-cat-sewa-aktif');
+        if (elCatSewAktif) elCatSewAktif.textContent = sewAktif;
+        var elCatSewSegera = document.getElementById('dash-cat-sewa-segera');
+        if (elCatSewSegera) elCatSewSegera.textContent = sewSegera;
+        var elCatSewExp = document.getElementById('dash-cat-sewa-exp');
+        if (elCatSewExp) elCatSewExp.textContent = sewExp;
+
+        // 4. Urgent Action Center Table
+        var urgentItems = [];
+
+        mobil.forEach(function (d) {
+          var tgl = d.jatuhTempo || d.tglPajak;
+          var dt = daysTo(tgl);
+          if (dt <= 30) {
+            urgentItems.push({
+              type: 'pajak',
+              typeLabel: 'Mobil',
+              typeIcon: 'fa-car-side',
+              typeColor: 'var(--gold)',
+              typeBg: 'rgba(201,168,76,0.15)',
+              id: d.id,
+              title: d.namaUnit || d.nama || 'Mobil',
+              subtitle: d.nopol || '-',
+              pic: d.atasNama || d.pemilik || d.pengguna || '-',
+              tgl: tgl,
+              days: dt,
+              nominal: num(d.nominal != null ? d.nominal : d.nomPajak) || 0
+            });
+          }
+        });
+
+        motor.forEach(function (d) {
+          var tgl = d.jatuhTempo || d.tglPajak;
+          var dt = daysTo(tgl);
+          if (dt <= 30) {
+            urgentItems.push({
+              type: 'motor',
+              typeLabel: 'Motor',
+              typeIcon: 'fa-motorcycle',
+              typeColor: 'var(--teal)',
+              typeBg: 'rgba(43,181,160,0.15)',
+              id: d.id,
+              title: d.namaUnit || d.nama || 'Motor',
+              subtitle: d.nopol || '-',
+              pic: d.atasNama || d.pemilik || d.pengguna || '-',
+              tgl: tgl,
+              days: dt,
+              nominal: num(d.nominal != null ? d.nominal : d.nomPajak) || 0
+            });
+          }
+        });
+
+        sewa.forEach(function (d) {
+          var tgl = d.tglBerakhir || d.jatuhTempo;
+          var dt = daysTo(tgl);
+          if (dt <= 30) {
+            var picDesc = [d.namaPenyewa ? 'Penyewa: ' + d.namaPenyewa : '', d.namaPemilik ? 'Pemilik: ' + d.namaPemilik : ''].filter(Boolean).join(' Â· ') || d.penghuni || '-';
+            urgentItems.push({
+              type: 'sewa',
+              typeLabel: 'Sewa',
+              typeIcon: 'fa-house-chimney',
+              typeColor: 'var(--amber)',
+              typeBg: 'rgba(212,146,74,0.15)',
+              id: d.id,
+              title: d.namaRumah || d.nama || 'Rumah Sewa',
+              subtitle: d.keterangan || d.lokasi || '-',
+              pic: picDesc,
+              tgl: tgl,
+              days: dt,
+              nominal: num(d.biaya != null ? d.biaya : d.nominal) || 0
+            });
+          }
+        });
+
+        // Sort: Expired (most negative first) -> Soon due
+        urgentItems.sort(function (a, b) { return a.days - b.days; });
+
+        var badgeTotal = document.getElementById('dash-urgent-badge-total');
+        if (badgeTotal) badgeTotal.textContent = urgentItems.length + ' Unit Urgent';
+
+        var tbody = document.getElementById('dash-urgent-tbody');
+        if (tbody) {
+          if (!urgentItems.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px 16px;color:var(--emerald)">' +
+              '<i class="fa-solid fa-circle-check" style="font-size:24px;margin-bottom:8px;display:block"></i>' +
+              '<strong>Status Terkendali & Aman</strong><br>' +
+              '<span style="font-size:12px;color:var(--text-3)">Tidak ada unit pajak atau sewa yang expired atau jatuh tempo dalam 30 hari ke depan.</span>' +
+              '</td></tr>';
+          } else {
+            var html = '';
+            urgentItems.forEach(function (item) {
+              var statusBadge = '';
+              if (item.days < 0) {
+                statusBadge = '<span class="badge" style="background:rgba(224,91,91,0.18);color:var(--rose);font-weight:700">' +
+                  '<i class="fa-solid fa-circle-xmark"></i> Expired ' + Math.abs(item.days) + ' hr lalu</span>';
+              } else if (item.days === 0) {
+                statusBadge = '<span class="badge" style="background:rgba(224,91,91,0.22);color:var(--rose);font-weight:700">' +
+                  '<i class="fa-solid fa-bell"></i> Hari Ini</span>';
+              } else {
+                statusBadge = '<span class="badge" style="background:rgba(212,146,74,0.18);color:var(--amber);font-weight:700">' +
+                  '<i class="fa-solid fa-clock"></i> ' + item.days + ' hari lagi</span>';
+              }
+
+              var searchKey = (item.subtitle && item.subtitle !== '-') ? item.subtitle : item.title;
+              var actionBtn = '<button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="event.stopPropagation(); openDetailItem(\'' + item.type + '\', \'' + item.id + '\', \'' + esc(searchKey).replace(/'/g, "\\'") + '\')" title="Buka data ' + esc(item.title) + '">' +
+                '<i class="fa-solid fa-arrow-right"></i> Buka</button>';
+
+              html += '<tr class="dash-urgent-row" style="cursor:pointer" onclick="openDetailItem(\'' + item.type + '\', \'' + item.id + '\', \'' + esc(searchKey).replace(/'/g, "\\'") + '\')" title="Klik untuk membuka data ' + esc(item.title) + '">' +
+                '<td><span class="badge" style="background:' + item.typeBg + ';color:' + item.typeColor + ';font-weight:700">' +
+                '<i class="fa-solid ' + item.typeIcon + '" style="margin-right:5px"></i>' + item.typeLabel + '</span></td>' +
+                '<td><strong style="color:var(--text-1)">' + item.title + '</strong><br><span style="font-size:11.5px;color:var(--text-3);font-family:monospace">' + item.subtitle + '</span></td>' +
+                '<td>' + item.pic + '</td>' +
+                '<td>' + fdate(item.tgl) + '</td>' +
+                '<td>' + statusBadge + '</td>' +
+                '<td style="text-align:right;font-weight:700;color:var(--text-1)">' + cur(item.nominal) + '</td>' +
+                '<td style="text-align:center">' + actionBtn + '</td>' +
+                '</tr>';
+            });
+            tbody.innerHTML = html;
+          }
+        }
+
+        // 5. Monthly Cashflow Breakdown (12 Months)
+        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        var monthlyTotals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var monthlyCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        function addMonthly(dateStr, amount) {
+          if (!dateStr) return;
+          var d = new Date(dateStr);
+          if (isNaN(d.getTime())) return;
+          var m = d.getMonth();
+          if (m >= 0 && m < 12) {
+            monthlyTotals[m] += (amount || 0);
+            monthlyCounts[m]++;
+          }
+        }
+
+        mobil.forEach(function (d) { addMonthly(d.jatuhTempo || d.tglPajak, num(d.nominal != null ? d.nominal : d.nomPajak)); });
+        motor.forEach(function (d) { addMonthly(d.jatuhTempo || d.tglPajak, num(d.nominal != null ? d.nominal : d.nomPajak)); });
+        sewa.forEach(function (d) { addMonthly(d.tglBerakhir || d.jatuhTempo, num(d.biaya != null ? d.biaya : d.nominal)); });
+
+        var maxMonthNom = 0;
+        monthlyTotals.forEach(function (val) { if (val > maxMonthNom) maxMonthNom = val; });
+        if (maxMonthNom === 0) maxMonthNom = 1;
+
+        var currentMonth = new Date().getMonth();
+        var mContainer = document.getElementById('dash-months-container');
+        if (mContainer) {
+          var mHtml = '';
+          for (var i = 0; i < 12; i++) {
+            var isCurr = (i === currentMonth);
+            var pct = Math.round((monthlyTotals[i] / maxMonthNom) * 100);
+            if (pct < 6 && monthlyTotals[i] > 0) pct = 6;
+            var currBadge = isCurr ? '<span style="font-size:9px;background:var(--gold);color:#0a0800;padding:1px 5px;border-radius:4px;font-weight:800;margin-top:2px">KINI</span>' : '';
+
+            mHtml += '<div class="dash-month-card' + (isCurr ? ' current' : '') + '">' +
+              '<div class="dash-month-name">' + monthNames[i] + '</div>' +
+              currBadge +
+              '<div class="dash-month-bar-track">' +
+              '<div class="dash-month-bar-fill" style="height:' + pct + '%;' + (isCurr ? 'background:linear-gradient(180deg,#fff,#e0b85a);' : '') + '"></div>' +
+              '</div>' +
+              '<div class="dash-month-val">' + (monthlyTotals[i] > 0 ? (Math.round(monthlyTotals[i] / 1000000 * 10) / 10) + ' Jt' : 'Rp 0') + '</div>' +
+              '<div class="dash-month-cnt">' + monthlyCounts[i] + ' tagihan</div>' +
+              '</div>';
+          }
+          mContainer.innerHTML = mHtml;
+        }
+      } catch (err) {
+        console.error('Dashboard render error:', err);
+      }
+    }
+
+    function openDetailItem(type, id, searchKey) {
+      var targetTab = (type === 'motor') ? 'motor' : ((type === 'sewa') ? 'sewa' : 'pajak');
+      switchTab(targetTab);
+
+      if (targetTab === 'pajak') {
+        activePajakFilter = '';
+        var sf = document.getElementById('f-pajak-sts');
+        if (sf) sf.value = '';
+        var qInput = document.getElementById('q-pajak');
+        if (qInput) qInput.value = searchKey || '';
+        renderPajak();
+      } else if (targetTab === 'motor') {
+        activeMotorFilter = '';
+        var sfMotor = document.getElementById('f-motor-sts');
+        if (sfMotor) sfMotor.value = '';
+        var qInputMotor = document.getElementById('q-motor');
+        if (qInputMotor) qInputMotor.value = searchKey || '';
+        renderMotor();
+      } else if (targetTab === 'sewa') {
+        var sfSewa = document.getElementById('f-sewa-sts');
+        if (sfSewa) sfSewa.value = '';
+        var kfSewa = document.getElementById('f-sewa-ket');
+        if (kfSewa) kfSewa.value = '';
+        var qInputSewa = document.getElementById('q-sewa');
+        if (qInputSewa) qInputSewa.value = searchKey || '';
+        renderSewa();
+      }
+
+      setTimeout(function () {
+        var el = document.getElementById('entry-' + targetTab + '-' + id);
+        if (!el) {
+          var list = document.getElementById('list-' + targetTab);
+          if (list) el = list.querySelector('.entry');
+        }
+        if (el) {
+          var y = el.getBoundingClientRect().top + window.scrollY - 110;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+          el.classList.add('entry-highlight-pulse');
+          setTimeout(function () {
+            el.classList.remove('entry-highlight-pulse');
+          }, 2500);
+        }
+      }, 120);
+    }
+
+    function switchTabAndFilter(statFilter) {
+      switchTab('pajak');
+      if (typeof filterPajakByStat === 'function') {
+        filterPajakByStat(statFilter);
+      }
+    }
+
+    function switchTabAndFilterMotor(statFilter) {
+      switchTab('motor');
+      if (typeof filterMotorByStat === 'function') {
+        filterMotorByStat(statFilter);
+      }
+    }
+
+    function switchTabAndFilterSewa(statFilter) {
+      switchTab('sewa');
+      if (typeof filterSewaByStat === 'function') {
+        filterSewaByStat(statFilter);
+      }
+    }
+
+    function printExecutiveReport() {
+      window.print();
     }
 
     /* ─── ADMIN ─────────────────────────────── */
@@ -3857,6 +5420,7 @@
       try {
         localStorage.setItem('riayah_admin', JSON.stringify(S.admin));
         localStorage.setItem('riayah_pajak', JSON.stringify(S.pajak));
+        localStorage.setItem('riayah_motor', JSON.stringify(S.motor));
         localStorage.setItem('riayah_sewa', JSON.stringify(S.sewa));
         localStorage.setItem('riayah_cache_ts', Date.now().toString());
       } catch (e) { }
@@ -3868,13 +5432,14 @@
         if (!ts || (Date.now() - parseInt(ts)) > 10 * 60 * 1000) return false;
         var la = localStorage.getItem('riayah_admin'); if (la) Object.assign(S.admin, JSON.parse(la));
         var lp = localStorage.getItem('riayah_pajak'); if (lp) S.pajak = JSON.parse(lp);
+        var lm = localStorage.getItem('riayah_motor'); if (lm) S.motor = JSON.parse(lm);
         var ls = localStorage.getItem('riayah_sewa'); if (ls) S.sewa = JSON.parse(ls);
         return true;
       } catch (e) { return false; }
     }
     function clearLocalCache() {
       try {
-        ['riayah_admin', 'riayah_pajak', 'riayah_sewa', 'riayah_cache_ts'].forEach(function (k) { localStorage.removeItem(k); });
+        ['riayah_admin', 'riayah_pajak', 'riayah_motor', 'riayah_sewa', 'riayah_cache_ts'].forEach(function (k) { localStorage.removeItem(k); });
       } catch (e) { }
     }
 
@@ -4012,10 +5577,10 @@
 
     /* ─── EXPORT & CETAK LAPORAN ────────────────────────────── */
     function exportData(type) {
-      var data = type === 'pajak' ? S.pajak : S.sewa;
+      var data = type === 'pajak' ? S.pajak : (type === 'motor' ? S.motor : S.sewa);
       if (!data.length) { toast('Tidak ada data untuk diekspor', 'warn'); return }
       var h, r;
-      if (type === 'pajak') {
+      if (type === 'pajak' || type === 'motor') {
         h = ['Nama Unit', 'No. Polisi', 'Atas Nama', 'Warna', 'Tgl Bayar Pajak', 'Nominal Pajak', 'Jatuh Tempo Pajak', 'Tgl Bayar STNK', 'Nominal STNK', 'Jatuh Tempo STNK', 'Keterangan'];
         r = data.map(function (d) { return [d.namaUnit, d.nopol, d.atasNama, d.warna, d.tglBayar, d.nominal, d.jatuhTempo, d.tglStnk, d.nominalStnk, d.jatuhTempoStnk, d.keterangan] });
       } else {
@@ -4030,10 +5595,10 @@
     }
 
     function exportExcel(type) {
-      var data = type === 'pajak' ? S.pajak : S.sewa;
+      var data = type === 'pajak' ? S.pajak : (type === 'motor' ? S.motor : S.sewa);
       if (!data.length) { toast('Tidak ada data untuk diekspor', 'warn'); return; }
 
-      var title = type === 'pajak' ? 'Rekapitulasi Pajak Kendaraan' : 'Rekapitulasi Sewa Rumah';
+      var title = type === 'pajak' ? 'Rekapitulasi Pajak Mobil' : (type === 'motor' ? 'Rekapitulasi Pajak Sepeda Motor' : 'Rekapitulasi Sewa Rumah');
       var nowStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
       var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
@@ -4057,14 +5622,14 @@
         '<p>Tanggal Cetak: ' + nowStr + ' | Total: ' + data.length + ' Data</p>' +
         '<table>';
 
-      if (type === 'pajak') {
-        var nopolCounts = getDuplicateNopols();
+      if (type === 'pajak' || type === 'motor') {
+        var nopolCounts = type === 'motor' ? getDuplicateNopolsMotor() : getDuplicateNopols();
         var totNomPajak = 0;
         var totNomStnk = 0;
         var totTunggakan = 0;
 
         html += '<thead><tr>' +
-          '<th>No</th><th>Nama Unit Kendaraan</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Warna</th>' +
+          '<th>No</th><th>Nama Unit ' + (type === 'motor' ? 'Motor' : 'Mobil') + '</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Warna</th>' +
           '<th>Tgl Bayar Pajak</th><th>Nominal Pajak/Thn</th><th>Jatuh Tempo Pajak</th>' +
           '<th>Tgl Bayar STNK</th><th>Nominal STNK</th><th>Jatuh Tempo STNK</th>' +
           '<th>Estimasi Tunggakan</th><th>Status</th><th>Keterangan</th>' +
@@ -4139,12 +5704,12 @@
           '</tr>';
       }
 
-      html += '</tbody></table></body></html>';
+      html += '</tbody></table></' + 'body></' + 'html>';
 
       var blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'Laporan_' + (type === 'pajak' ? 'Pajak_Kendaraan' : 'Sewa_Rumah') + '_' + new Date().toISOString().split('T')[0] + '.xls';
+      a.download = 'Laporan_' + (type === 'pajak' ? 'Pajak_Mobil' : (type === 'motor' ? 'Pajak_Motor' : 'Sewa_Rumah')) + '_' + new Date().toISOString().split('T')[0] + '.xls';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -4152,7 +5717,7 @@
     }
 
     function printReport(type) {
-      var data = type === 'pajak' ? S.pajak : S.sewa;
+      var data = type === 'pajak' ? S.pajak : (type === 'motor' ? S.motor : S.sewa);
       if (!data.length) { toast('Tidak ada data untuk dicetak', 'warn'); return; }
 
       var printWin = window.open('', '_blank');
@@ -4164,8 +5729,10 @@
       var nowStr = new Date().toLocaleDateString('id-ID', {
         weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
       });
-      var isPajak = type === 'pajak';
-      var title = isPajak ? 'REKAPITULASI PEMBAYARAN PAJAK KENDARAAN' : 'REKAPITULASI SEWA RUMAH & PROPERTI';
+      var isPajak = type === 'pajak' || type === 'motor';
+      var isMotor = type === 'motor';
+      var title = isMotor ? 'REKAPITULASI PEMBAYARAN PAJAK SEPEDA MOTOR' :
+                  (isPajak ? 'REKAPITULASI PEMBAYARAN PAJAK MOBIL' : 'REKAPITULASI SEWA RUMAH & PROPERTI');
 
       // Ringkasan Header
       var summaryHtml = '';
@@ -4198,7 +5765,7 @@
       // Baris Tabel
       var rowsHtml = '';
       if (isPajak) {
-        var nopolCounts = getDuplicateNopols();
+        var nopolCounts = isMotor ? getDuplicateNopolsMotor() : getDuplicateNopols();
         rowsHtml = data.map(function (d, i) {
           var st = sts(daysTo(d.jatuhTempo));
           var tunggakan = hitungTunggakanPajak(d);
@@ -4238,7 +5805,7 @@
       }
 
       var theadHtml = isPajak ?
-        '<tr><th>No</th><th>Nama Unit Kendaraan</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Tempo Pajak</th><th>Nominal Pajak</th><th>Tempo STNK</th><th>Nominal STNK</th><th>Status</th><th>Estimasi Tunggakan</th></tr>' :
+        '<tr><th>No</th><th>Nama Unit ' + (isMotor ? 'Motor' : 'Mobil') + '</th><th>No. Polisi</th><th>Pengguna / Atas Nama</th><th>Tempo Pajak</th><th>Nominal Pajak</th><th>Tempo STNK</th><th>Nominal STNK</th><th>Status</th><th>Estimasi Tunggakan</th></tr>' :
         '<tr><th>No</th><th>Nama / Alamat Rumah</th><th>Nama Penyewa</th><th>Pemilik Rumah</th><th>Keterangan</th><th>Tgl Mulai</th><th>Tgl Berakhir</th><th>Biaya Sewa</th><th>Status</th></tr>';
 
       var docContent = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
@@ -4283,7 +5850,7 @@
         '<div style="font-weight:700;color:#0f172a;margin-top:2px">DIVISI RIAYAH CENTER</div>' +
         '<div class="sign-line">Pengurus / Admin Riayah</div>' +
         '</div></div>' +
-        '</body></html>';
+        '</' + 'body></' + 'html>';
 
       printWin.document.open();
       printWin.document.write(docContent);
@@ -4396,16 +5963,19 @@
       if (action === 'getAllData') {
         Promise.all([
           fetch(SUPABASE_URL + '/rest/v1/pajak?select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); }),
+          fetch(SUPABASE_URL + '/rest/v1/pajak_motor?select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); }),
           fetch(SUPABASE_URL + '/rest/v1/sewa?select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); }),
           fetch(SUPABASE_URL + '/rest/v1/admin_settings?key=eq.config&select=*', { headers: sbHeaders() }).then(function(r) { return r.json(); })
         ])
         .then(function(results) {
           var rawPajak = Array.isArray(results[0]) ? results[0] : [];
-          var rawSewa = Array.isArray(results[1]) ? results[1] : [];
-          var rawAdmin = (Array.isArray(results[2]) && results[2][0] && results[2][0].value) || null;
+          var rawMotor = Array.isArray(results[1]) ? results[1] : [];
+          var rawSewa = Array.isArray(results[2]) ? results[2] : [];
+          var rawAdmin = (Array.isArray(results[3]) && results[3][0] && results[3][0].value) || null;
           var outPajak = rawPajak.map(mapPajakFromDb);
+          var outMotor = rawMotor.map(mapPajakFromDb);
           var outSewa = rawSewa.map(mapSewaFromDb);
-          if (onSuccess) onSuccess({ success: true, pajak: outPajak, sewa: outSewa, admin: rawAdmin });
+          if (onSuccess) onSuccess({ success: true, pajak: outPajak, motor: outMotor, sewa: outSewa, admin: rawAdmin });
         })
         .catch(function(err) {
           // Fallback ke Google Apps Script jika Supabase terhalang koneksi
@@ -4418,8 +5988,8 @@
       }
 
       if (action === 'saveRecord') {
-        var tbl = payload.type === 'pajak' ? 'pajak' : 'sewa';
-        var record = payload.type === 'pajak' ? mapPajakToDb(payload.data) : mapSewaToDb(payload.data);
+        var tbl = payload.type === 'pajak' ? 'pajak' : (payload.type === 'motor' ? 'pajak_motor' : 'sewa');
+        var record = (payload.type === 'pajak' || payload.type === 'motor') ? mapPajakToDb(payload.data) : mapSewaToDb(payload.data);
         fetch(SUPABASE_URL + '/rest/v1/' + tbl, {
           method: 'POST',
           headers: sbHeaders(),
@@ -4445,7 +6015,7 @@
       }
 
       if (action === 'deleteRecord') {
-        var tblDel = payload.type === 'pajak' ? 'pajak' : 'sewa';
+        var tblDel = payload.type === 'pajak' ? 'pajak' : (payload.type === 'motor' ? 'pajak_motor' : 'sewa');
         fetch(SUPABASE_URL + '/rest/v1/' + tblDel + '?id=eq.' + encodeURIComponent(payload.id), {
           method: 'DELETE',
           headers: sbHeaders()
@@ -4573,6 +6143,7 @@
 
     function syncLocalToSheet() {
       var records = S.pajak.filter(function (d) { return d.id; }).concat(
+        (S.motor || []).filter(function (d) { return d.id; }),
         S.sewa.filter(function (d) { return d.id; }));
       if (!records.length) { showSyncBtn(false); return; }
 
@@ -4598,6 +6169,7 @@
         }
       }
       S.pajak.forEach(function (d) { if (d.id) saveToSheet('pajak', d, onDone); });
+      (S.motor || []).forEach(function (d) { if (d.id) saveToSheet('motor', d, onDone); });
       S.sewa.forEach(function (d) { if (d.id) saveToSheet('sewa', d, onDone); });
     }
 
@@ -4605,9 +6177,12 @@
     function loadAll() {
       var hasCachedData = loadLocalCache();
       if (hasCachedData) {
-        populateAdminForm(); renderPajak(); renderSewa(); badges();
+        populateAdminForm(); renderPajak(); renderMotor(); renderSewa(); badges();
       } else {
         document.getElementById('list-pajak').innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">⏳</div><div class="empty-title">Memuat data…</div><div class="empty-desc">Mohon tunggu sebentar</div></div>';
+        if (document.getElementById('list-motor')) {
+          document.getElementById('list-motor').innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">⏳</div><div class="empty-title">Memuat data…</div><div class="empty-desc">Mohon tunggu sebentar</div></div>';
+        }
         document.getElementById('list-sewa').innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">⏳</div><div class="empty-title">Memuat data…</div><div class="empty-desc">Mohon tunggu sebentar</div></div>';
       }
 
@@ -4619,15 +6194,17 @@
         }
 
         var sheetPajak = r.pajak || [];
+        var sheetMotor = r.motor || [];
         var sheetSewa = r.sewa || [];
 
-        if (sheetPajak.length > 0 || sheetSewa.length > 0 || !hasCachedData) {
+        if (sheetPajak.length > 0 || sheetMotor.length > 0 || sheetSewa.length > 0 || !hasCachedData) {
           S.pajak = sheetPajak;
+          S.motor = sheetMotor;
           S.sewa = sheetSewa;
           if (r.admin) { Object.assign(S.admin, r.admin); populateAdminForm(); }
           saveLocalCache();
-          renderPajak(); renderSewa(); badges();
-        } else if (hasCachedData && (S.pajak.length > 0 || S.sewa.length > 0)) {
+          renderPajak(); renderMotor(); renderSewa(); badges();
+        } else if (hasCachedData && (S.pajak.length > 0 || (S.motor && S.motor.length > 0) || S.sewa.length > 0)) {
           toast('🔄 Menyimpan data lokal ke database…', 'warn');
           syncLocalToSheet();
         }
@@ -4635,15 +6212,185 @@
         if (!hasCachedData) {
           toast('⚠️ Gagal sinkronisasi data.', 'warn');
         }
-        renderPajak(); renderSewa(); badges();
+        renderPajak(); renderMotor(); renderSewa(); badges();
       });
     }
 
+    /* ─── CINEMATIC INTRO SPLASH CONTROLS (PURE VIDEO) ───── */
+    function initIntroSplash() {
+      var overlay = document.getElementById('introSplashOverlay');
+      var video = document.getElementById('splashVideo');
+      var skipBtn = document.getElementById('splashSkipBtn');
+      var manualBtn = document.getElementById('splashManualPlayBtn');
+      var progressBar = document.getElementById('splashProgressBar');
+
+      if (!overlay || !video) return;
+
+      // Event: tombol Lewati (dukung pointerdown, click, touchend agar instan)
+      if (skipBtn) {
+        var onSkip = function (e) {
+          if (e) {
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
+          }
+          closeSplashVideo(e);
+        };
+        skipBtn.addEventListener('pointerdown', onSkip);
+        skipBtn.addEventListener('click', onSkip);
+        skipBtn.addEventListener('touchend', onSkip);
+      }
+
+      // Event: klik di mana saja pada overlay untuk putar / aktifkan suara
+      overlay.addEventListener('click', function (e) {
+        if (e.target.closest('#splashSkipBtn') || e.target.closest('#splashManualPlayBtn')) return;
+        if (video) {
+          if (video.muted) {
+            video.muted = false;
+            video.volume = 1.0;
+          }
+          if (video.paused) {
+            video.play();
+          }
+        }
+      });
+
+      // Event: fallback manual play jika browser blokir total
+      if (manualBtn) {
+        manualBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          video.muted = false;
+          video.play().catch(function() {
+            video.muted = true;
+            video.play();
+          });
+          manualBtn.style.display = 'none';
+        });
+      }
+
+      // Progress bar & selesai otomatis langsung masuk ke dashboard
+      video.addEventListener('timeupdate', function () {
+        if (video.duration && progressBar) {
+          var pct = (video.currentTime / video.duration) * 100;
+          progressBar.style.width = Math.min(pct, 100) + '%';
+        }
+        // Masuk dashboard saat video mendekati akhir (9.6s+)
+        if (video.duration && video.currentTime >= (video.duration - 0.35)) {
+          closeSplashVideo();
+        }
+      });
+
+      video.addEventListener('ended', function () {
+        closeSplashVideo();
+      });
+
+      // Cadangan waktu: jika browser tidak memicu ended, otomatis masuk dashboard setelah durasi video + 0.3s
+      video.addEventListener('loadedmetadata', function () {
+        var waitSec = (video.duration && video.duration > 0) ? (video.duration + 0.3) : 10.3;
+        setTimeout(function () {
+          closeSplashVideo();
+        }, waitSec * 1000);
+      });
+      // Cadangan mutlak: 11 detik
+      setTimeout(function () {
+        closeSplashVideo();
+      }, 11000);
+
+      // Keyboard escape atau space to skip video
+      window.addEventListener('keydown', function (e) {
+        if ((e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') && overlay && overlay.style.display !== 'none') {
+          closeSplashVideo();
+        }
+      });
+
+      // Mulai putar otomatis
+      playSplashVideo();
+    }
+
+    async function playSplashVideo() {
+      var overlay = document.getElementById('introSplashOverlay');
+      var video = document.getElementById('splashVideo');
+      var manualBtn = document.getElementById('splashManualPlayBtn');
+      var progressBar = document.getElementById('splashProgressBar');
+
+      if (!overlay || !video) return;
+
+      overlay.classList.remove('fade-out');
+      overlay.style.display = 'flex';
+      if (progressBar) progressBar.style.width = '0%';
+
+      // Coba putar langsung DENGAN SUARA AKTIF jika browser mengizinkan
+      video.muted = false;
+      try {
+        await video.play();
+        if (manualBtn) manualBtn.style.display = 'none';
+      } catch (unmutedErr) {
+        // Jika browser membatasi suara awal, jalankan muted terlebih dahulu agar video tetap berputar mulus
+        video.muted = true;
+        try {
+          await video.play();
+          if (manualBtn) manualBtn.style.display = 'none';
+        } catch (muteErr) {
+          if (manualBtn) manualBtn.style.display = 'flex';
+        }
+
+        // Pasang listener satu kali klik/tekan tombol apa pun untuk langsung hidupkan suara diam-diam
+        var autoUnmuteOnFirstAction = function (e) {
+          if (e && e.target && e.target.closest('#splashSkipBtn')) return;
+          if (video) {
+            video.muted = false;
+            video.volume = 1.0;
+            if (video.paused) video.play();
+          }
+          window.removeEventListener('pointerdown', autoUnmuteOnFirstAction);
+          window.removeEventListener('keydown', autoUnmuteOnFirstAction);
+        };
+        window.addEventListener('pointerdown', autoUnmuteOnFirstAction, { once: true });
+        window.addEventListener('keydown', autoUnmuteOnFirstAction, { once: true });
+      }
+    }
+
+    function closeSplashVideo(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
+      var overlay = document.getElementById('introSplashOverlay');
+      var video = document.getElementById('splashVideo');
+
+      if (video) {
+        try {
+          video.pause();
+          video.src = "";
+          video.load();
+        } catch (err) {}
+      }
+
+      if (overlay) {
+        overlay.style.pointerEvents = 'none';
+        overlay.classList.add('fade-out');
+        overlay.style.opacity = '0';
+        overlay.style.visibility = 'hidden';
+        setTimeout(function () {
+          if (overlay && overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+          }
+        }, 300);
+      }
+    }
+    window.closeSplashVideo = closeSplashVideo;
+
     /* ─── INIT ──────────────────────────────── */
-    document.addEventListener('DOMContentLoaded', function () {
+    function startApp() {
+      initIntroSplash();
       updateAdminUI();
-      renderEmails(); renderPajak(); renderSewa(); badges(); loadAll();
-    });
+      renderEmails(); renderPajak(); renderMotor(); renderSewa(); badges(); renderDashboard(); loadAll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startApp);
+    } else {
+      startApp();
+    }
   </script>
 </body>
 

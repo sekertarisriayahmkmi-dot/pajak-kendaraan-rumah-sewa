@@ -1,4 +1,4 @@
-﻿-- =====================================================
+-- =====================================================
 -- MIGRATION SCRIPT DARI SPREADSHEET KE SUPABASE
 -- Project: epyhjapavslexaifbtkh
 -- =====================================================
@@ -21,7 +21,25 @@ CREATE TABLE IF NOT EXISTS public.pajak (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. BUAT TABEL SEWA RUMAH
+-- 2. BUAT TABEL PAJAK MOTOR
+CREATE TABLE IF NOT EXISTS public.pajak_motor (
+    id TEXT PRIMARY KEY,
+    nama_unit TEXT,
+    nopol TEXT,
+    atas_nama TEXT,
+    warna TEXT,
+    tgl_bayar TEXT,
+    nominal NUMERIC DEFAULT 0,
+    jatuh_tempo TEXT,
+    tgl_stnk TEXT,
+    nominal_stnk NUMERIC DEFAULT 0,
+    jatuh_tempo_stnk TEXT,
+    keterangan TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. BUAT TABEL SEWA RUMAH
 CREATE TABLE IF NOT EXISTS public.sewa (
     id TEXT PRIMARY KEY,
     nama_rumah TEXT,
@@ -38,20 +56,24 @@ CREATE TABLE IF NOT EXISTS public.sewa (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. BUAT TABEL PENGATURAN ADMIN
+-- 4. BUAT TABEL PENGATURAN ADMIN
 CREATE TABLE IF NOT EXISTS public.admin_settings (
     key TEXT PRIMARY KEY,
     value JSONB,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. AKTIFKAN RLS DAN BERIKAN AKSES ANON / PUBLIC
+-- 5. AKTIFKAN RLS DAN BERIKAN AKSES ANON / PUBLIC
 ALTER TABLE public.pajak ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pajak_motor ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sewa ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_settings ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public Pajak Policy" ON public.pajak;
 CREATE POLICY "Public Pajak Policy" ON public.pajak FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public Pajak Motor Policy" ON public.pajak_motor;
+CREATE POLICY "Public Pajak Motor Policy" ON public.pajak_motor FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Sewa Policy" ON public.sewa;
 CREATE POLICY "Public Sewa Policy" ON public.sewa FOR ALL USING (true) WITH CHECK (true);

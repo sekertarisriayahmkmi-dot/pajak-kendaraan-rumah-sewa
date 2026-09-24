@@ -7,6 +7,7 @@
 
 // ── Sheet names ──────────────────────────────────────────────
 var SHEET_PAJAK  = 'DataPajak';
+var SHEET_MOTOR  = 'DataPajakMotor';
 var SHEET_SEWA   = 'DataSewa';
 var SHEET_ADMIN  = 'AdminSettings';
 
@@ -120,6 +121,7 @@ function ensureSheetsExist(ss) {
   if (!ss) ss = getSpreadsheet(); // Fallback: ambil otomatis jika dipanggil tanpa argumen
   var sheetDefs = [
     { name: SHEET_PAJAK,  headers: PAJAK_HEADERS  },
+    { name: SHEET_MOTOR,  headers: PAJAK_HEADERS  },
     { name: SHEET_SEWA,   headers: SEWA_HEADERS   },
     { name: SHEET_ADMIN,  headers: ['Key','Value'] }
   ];
@@ -146,6 +148,7 @@ function getAllData() {
     return {
       success: true,
       pajak: getPajakList(ss),
+      motor: getMotorList(ss),
       sewa:  getSewaList(ss),
       admin: getAdminConfig(ss)
     };
@@ -160,6 +163,35 @@ function getAllData() {
 function getPajakList(ss) {
   if (!ss) ss = getSpreadsheet(); // Fallback jika dipanggil langsung dari editor
   var sh   = ss.getSheetByName(SHEET_PAJAK);
+  if (!sh) return [];
+  var data = sh.getDataRange().getValues();
+  if (data.length <= 1) return [];
+  return data.slice(1).map(function(r) {
+    return {
+      id:             r[0],
+      namaUnit:       r[1],
+      nopol:          r[2],
+      atasNama:       r[3],
+      warna:          r[4],
+      tglBayar:       r[5] ? Utilities.formatDate(new Date(r[5]), 'Asia/Jakarta', 'yyyy-MM-dd') : '',
+      nominal:        r[6],
+      jatuhTempo:     r[7] ? Utilities.formatDate(new Date(r[7]), 'Asia/Jakarta', 'yyyy-MM-dd') : '',
+      tglStnk:        r[8] ? Utilities.formatDate(new Date(r[8]), 'Asia/Jakarta', 'yyyy-MM-dd') : '',
+      nominalStnk:    r[9],
+      jatuhTempoStnk: r[10] ? Utilities.formatDate(new Date(r[10]), 'Asia/Jakarta', 'yyyy-MM-dd') : '',
+      keterangan:     r[11],
+      createdAt:      r[12],
+      updatedAt:      r[13]
+    };
+  }).filter(function(r){ return r.id; });
+}
+
+/* ─────────────────────────────────────────────────────────────
+   getMotorList
+───────────────────────────────────────────────────────────── */
+function getMotorList(ss) {
+  if (!ss) ss = getSpreadsheet();
+  var sh   = ss.getSheetByName(SHEET_MOTOR);
   if (!sh) return [];
   var data = sh.getDataRange().getValues();
   if (data.length <= 1) return [];
@@ -248,6 +280,8 @@ function saveRecord(type, dataJson) {
     var ss = getSpreadsheet();
     if (type === 'pajak') {
       upsertPajak(ss, d);
+    } else if (type === 'motor') {
+      upsertMotor(ss, d);
     } else if (type === 'sewa') {
       upsertSewa(ss, d);
     }
@@ -262,6 +296,24 @@ function upsertPajak(ss, d) {
   ensureSheetsExist(ss);
   var sh   = ss.getSheetByName(SHEET_PAJAK);
   cleanEmptyRows(sh); // Bersihkan baris tanpa ID sebelum upsert
+  var data = sh.getDataRange().getValues();
+  var row  = [
+    d.id, d.namaUnit, d.nopol, d.atasNama, d.warna,
+    d.tglBayar||'', d.nominal||0, d.jatuhTempo||'',
+    d.tglStnk||'', d.nominalStnk||0, d.jatuhTempoStnk||'',
+    d.keterangan||'', d.createdAt||new Date().toISOString(), d.updatedAt||new Date().toISOString()
+  ];
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === d.id) { sh.getRange(i + 1, 1, 1, row.length).setValues([row]); return; }
+  }
+  sh.appendRow(row);
+}
+
+function upsertMotor(ss, d) {
+  if (!d || !d.id) return;
+  ensureSheetsExist(ss);
+  var sh   = ss.getSheetByName(SHEET_MOTOR);
+  cleanEmptyRows(sh);
   var data = sh.getDataRange().getValues();
   var row  = [
     d.id, d.namaUnit, d.nopol, d.atasNama, d.warna,
@@ -302,11 +354,11 @@ function cleanEmptyRows(sh) {
   // Fallback: jika dipanggil langsung dari editor tanpa argumen
   if (!sh) {
     var ss = getSpreadsheet();
-    [SHEET_PAJAK, SHEET_SEWA].forEach(function(name) {
+    [SHEET_PAJAK, SHEET_MOTOR, SHEET_SEWA].forEach(function(name) {
       var s = ss.getSheetByName(name);
       if (s) cleanEmptyRows(s);
     });
-    Logger.log('✅ Semua baris kosong berhasil dihapus dari DataPajak & DataSewa.');
+    Logger.log('✅ Semua baris kosong berhasil dihapus dari DataPajak, DataPajakMotor & DataSewa.');
     return;
   }
   var data = sh.getDataRange().getValues();
@@ -324,7 +376,7 @@ function cleanEmptyRows(sh) {
 function deleteRecord(type, id) {
   try {
     var ss      = getSpreadsheet();
-    var shName  = type === 'pajak' ? SHEET_PAJAK : SHEET_SEWA;
+    var shName  = type === 'pajak' ? SHEET_PAJAK : (type === 'motor' ? SHEET_MOTOR : SHEET_SEWA);
     var sh      = ss.getSheetByName(shName);
     if (!sh) return { success: true };
     var data    = sh.getDataRange().getValues();
@@ -411,8 +463,8 @@ function checkAndSendReminders() {
 
   // ── Check Pajak ───────────────────────────────────────────
   if (cfg.togglePajak) {
-    var pajakList = getPajakList(ss);
-    pajakList.forEach(function(d) {
+    var allPajakList = getPajakList(ss).concat(getMotorList(ss));
+    allPajakList.forEach(function(d) {
       if (!d.jatuhTempo) return;
       var days = Math.ceil((new Date(d.jatuhTempo) - today) / 86400000);
       if (days >= 0 && days <= cfg.rangePajak) {
@@ -430,8 +482,8 @@ function checkAndSendReminders() {
 
   // ── Check STNK ───────────────────────────────────────────
   if (cfg.toggleStnk) {
-    var pajakList2 = getPajakList(ss);
-    pajakList2.forEach(function(d) {
+    var allPajakList2 = getPajakList(ss).concat(getMotorList(ss));
+    allPajakList2.forEach(function(d) {
       if (!d.jatuhTempoStnk) return;
       var days = Math.ceil((new Date(d.jatuhTempoStnk) - today) / 86400000);
       if (days >= 0 && days <= cfg.rangeStnk) {
